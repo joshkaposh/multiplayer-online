@@ -2,7 +2,7 @@ const initServer = require("./startup");
 const { server, io } = initServer();
 const connectToDatabase = require("./db/connect");
 const models = require("./db/schema");
-
+const gameMap = require("./game/map");
 const getUniqueID = () => {
 	const s4 = () =>
 		Math.floor((1 + Math.random()) * 0x10000)
@@ -62,7 +62,7 @@ const ioHandlers = {
 					io.sockets.emit("newUser", data);
 				}
 				// redirect to game
-				socket.emit("loadGame", data);
+				socket.emit("loadGame", { ...gameMap });
 
 				console.log(user);
 			});
@@ -96,6 +96,8 @@ server.listen(5000, function () {
 		ioHandlers.input.receiveNameHandler(socket);
 		ioHandlers.input.playerMoved(socket);
 		ioHandlers.input.expGain(socket);
+
+		socket.on("helloWorld", console.log);
 
 		socket.on("mousemove", (data) => {
 			io.sockets.emit("playerMove", data);
