@@ -1,16 +1,29 @@
 export default class Camera {
-	constructor(c, x, y, width, height) {
-		this.tilesize = 64;
+	constructor(c, tilesize, x, y, width, height, worldW, worldH) {
 		this.c = c;
+		this.tilesize = tilesize;
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
+		this.worldW = worldW;
+		this.worldH = worldH;
 		this.minX = 0;
 		this.minY = 0;
 	}
 
-	center() {}
+	panUp() {
+		this.y -= this.tilesize;
+	}
+	panDown() {
+		this.y += this.tilesize;
+	}
+	panLeft() {
+		this.x -= this.tilesize;
+	}
+	panRight() {
+		this.x += this.tilesize;
+	}
 
 	offsetToMiddle(
 		targetX,
@@ -38,9 +51,9 @@ export default class Camera {
 
 		if (x < xMin || x > xMax || y < yMin || y > yMax) {
 			// tile is out of camera view
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 	getDimensions() {
@@ -52,14 +65,13 @@ export default class Camera {
 		};
 	}
 
-	follow(player) {
-		console.log("camera following player");
-		// if (player.x + player.width > this.x + this.width) {
-		// 	this.x += 64;
-		// }
-		// this.x = player.x - this.width * 0.5;
-		// this.y = player.y - this.height * 0.5;
-		// this.x = this.width * 0.5;
-		// this.y = this.height * 0.5;
+	follow(player) {}
+
+	draw() {
+		let cameraX = this.c.canvas.width / 2 - this.width / 2;
+		let cameraY = this.c.canvas.height / 2 - this.height / 2;
+
+		this.c.rect(cameraX, cameraY, this.width, this.height);
+		this.c.stroke();
 	}
 }

@@ -1,12 +1,12 @@
-import EstablishConnection from "./components/establishConnection";
 import { Switch, BrowserRouter as Router } from "react-router-dom";
+import Pages from "./components/pages/Pages";
+
 function App() {
 	return (
 		<Router>
+			<div className="App"></div>
 			<Switch>
-				<div className="App">
-					<EstablishConnection />
-				</div>
+				<Pages />
 			</Switch>
 		</Router>
 	);

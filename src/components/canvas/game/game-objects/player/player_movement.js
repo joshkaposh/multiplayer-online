@@ -1,94 +1,162 @@
 import PathFind from "./player_pathing";
-import { GridInfo } from "../../map/world";
 
-console.log(GridInfo());
-
-export default class PlayerMovement extends PathFind {
-	constructor(name, turnmanager, c, camera, x, y, speed) {
-		super(turnmanager, c, x, y, speed);
-		this.name = name;
-		this.turnmanager = turnmanager;
-		this.c = c;
-		this.camera = camera;
-		this.x = x;
-		this.y = y;
-	}
-
-	attachKeyListener(socket) {
-		document.addEventListener("keydown", (e) => {
-			switch (e.code) {
-				case "KeyW":
-					this.y - this.speed.y >= 0
-						? this._move("w")
-						: this.promptUser(
-								`Unable to move ${e.code}: select a better path.`
-						  );
-					break;
-				case "KeyA":
-					this.x - this.speed.x >= 0
-						? this._move("a")
-						: this.promptUser(
-								`Unable to move ${e.code}: select a better path.`
-						  );
-
-					break;
-				case "KeyS":
-					this.y + this.speed.y <= 400
-						? this._move("s")
-						: this.promptUser(
-								`Unable to move ${e.code}: select a better path.`
-						  );
-
-					break;
-				case "KeyD":
-					this.x + this.speed.x <= 600
-						? this._move("d")
-						: this.promptUser(
-								`Unable to move ${e.code}: select a better path.`
-						  );
-
-					break;
-				default:
-					break;
-			}
-		});
+class Move extends PathFind {
+	constructor(c, camera, x, y, tilesize) {
+		super(c, camera, x, y, 0, 0);
+		this.tilesize = tilesize;
 	}
 
 	_move(dir) {
 		this.addToPreviousPositions();
+		// const width =
+		// 	document.getElementsByClassName("MapInfo")[0].children[1]
+		// 		.children[0].firstChild;
+		// const height =
+		// 	document.getElementsByClassName("MapInfo")[0].children[1]
+		// 		.children[0].lastChild;
 
 		switch (dir) {
-			case "w":
-				this.y -= this.speed.y;
-
+			case "KeyW":
+				this.moveUp();
 				break;
-			case "a":
-				this.x -= this.speed.x;
-
+			case "KeyA":
+				this.moveLeft();
 				break;
-			case "s":
-				this.y += this.speed.y;
-
+			case "KeyS":
+				this.moveDown();
 				break;
-			case "d":
-				this.x += this.speed.x;
-
+			case "KeyD":
+				this.moveRight();
 				break;
 			default:
 				break;
 		}
-		this.camera.follow();
-		// console.log("availablePositions::", this.getPaths());
+	}
 
-		// console.log("previousPaths::", this.previousPositions);
-		// console.log(
-		// 	"removeAvailableFromPrevious::",
-		// 	this.removeAvailableFromPrevious(this.setAvailablePaths())
-		// );
-		// console.log("setAvailablePaths::", this.setAvailablePaths());
+	moveLeft() {
+		if (this.x - this.speed.x < 0) {
+			return this.displayToUser("cant move past world x limit: 0");
+		}
 
-		// console.log(`x: ${this.x}, y: ${this.y}, direction: ${dir}`);
+		if (!this.isMoveWithinCamera("KeyA")) {
+			this.camera.panLeft();
+			this.offsetX += this.speed.x;
+		}
 
-		// this.manager.endTurn(this.name, dir);
+		this.x -= this.speed.x;
+	}
+
+	moveRight() {
+		const worldWidth = this.tilesize * 20;
+		if (this.x + this.tilesize + this.speed.x > worldWidth) {
+			return this.displayToUser(
+				`cant move past world x limit: ${worldWidth}`
+			);
+		}
+
+		if (!this.isMoveWithinCamera("KeyD")) {
+			this.camera.panRight();
+			this.offsetX -= this.tilesize;
+		}
+
+		this.x += this.speed.x;
+	}
+
+	moveUp() {
+		if (this.y - this.speed.y < 0) {
+			return this.displayToUser(`cant move past world y limit 0`);
+		}
+
+		if (!this.isMoveWithinCamera("KeyW")) {
+			this.camera.panUp();
+			this.offsetY += this.speed.y;
+		}
+		this.y -= this.speed.y;
+	}
+
+	moveDown() {
+		const worldHeight = this.tilesize * 20;
+
+		if (this.y + this.tilesize + this.speed.y > worldHeight) {
+			return this.displayToUser(
+				`cant move past world y limit: ${worldHeight}`
+			);
+		}
+
+		if (!this.isMoveWithinCamera("KeyS")) {
+			this.camera.panDown();
+			this.offsetY -= this.speed.y;
+		}
+
+		this.y += this.speed.y;
+	}
+}
+
+export default class PlayerMovement extends Move {
+	constructor(name, c, camera, x, y, tilesize, speed) {
+		super(c, camera, x, y, tilesize, speed);
+		this.name = name;
+		this.c = c;
+		this.camera = camera;
+		this.x = x;
+		this.y = y;
+		this.tilesize = tilesize;
+	}
+
+	displayToUser(msg) {
+		const tag = document.getElementsByClassName("player-info")[0];
+		const h2 = document.getElementsByClassName("player-info")[0].firstChild;
+		h2.innerText = msg;
+
+		if (h2.innerText) {
+			document.getElementsByClassName("player-info")[0].style.display =
+				"block";
+		}
+
+		tag.classList.toggle("visible", true);
+		tag.classList.toggle("invisible", false);
+
+		let timer = setTimeout(() => {
+			tag.classList.toggle("visible", false);
+			tag.classList.toggle("invisible", true);
+
+			clearTimeout(timer);
+		}, 2500);
+	}
+
+	attachKeyListener(socket) {
+		document.addEventListener("keydown", (e) => {
+			this._move(e.code);
+		});
+	}
+
+	isMoveWithinCamera(dir) {
+		let { xMin, xMax, yMin, yMax } = this.camera.getDimensions();
+		const tilesize = 64;
+
+		switch (dir) {
+			case "KeyW":
+				if ((this.y - this.speed.y) / 64 < yMin) {
+					return false;
+				}
+				return true;
+			case "KeyA":
+				if ((this.x - this.speed.x) / 64 < xMin) {
+					return false;
+				}
+				return true;
+			case "KeyS":
+				if ((this.y + tilesize + this.speed.y) / 64 > yMax) {
+					return false;
+				}
+				return true;
+			case "KeyD":
+				if ((this.x + tilesize + this.speed.x) / 64 > xMax) {
+					return false;
+				}
+				return true;
+			default:
+				break;
+		}
 	}
 }

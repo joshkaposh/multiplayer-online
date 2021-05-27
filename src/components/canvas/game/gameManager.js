@@ -1,6 +1,5 @@
 import Player from "./game-objects/player/player";
 import EnemyController from "./game-objects/enemy/enemyController";
-import MapEditor from "./mapEditor";
 import Camera from "./render/camera";
 import World from "./map/world";
 
@@ -31,23 +30,48 @@ export class TurnManager {
 }
 
 export default class GameManager {
-	constructor(socket, c, players) {
+	constructor(
+		socket,
+		c,
+		playerName,
+		{ data: map, rows, columns, tilesize, mapW, mapH }
+	) {
 		this.socket = socket;
 		this.c = c;
-		this.players = players;
 		this.enemies = [];
-		this.tilesize = 64;
-		this.columns = 20;
-		this.rows = 20;
+		this.tilesize = tilesize;
+		this.columns = columns;
+		this.rows = rows;
 		// this.map_editor = new MapEditor(this.c);
 		this.manager = new TurnManager(this.socket);
-		this.camera = new Camera(this.c, 0, 0, 400, 200);
+		this.camera = new Camera(
+			this.c,
+			tilesize,
+			0,
+			0,
+			tilesize * 5,
+			tilesize * 5,
+			mapW,
+			mapH
+		);
+		const player = new Player(
+			playerName,
+			this.c,
+			this.camera,
+			0,
+			0,
+			tilesize,
+			{ x: tilesize, y: tilesize },
+			tilesize,
+			tilesize,
+			"grey"
+		);
+
 		this.world = new World(
 			this.c,
 			this.camera,
-			this.tilesize,
-			this.columns,
-			this.rows
+			{ data: map, rows, columns, tilesize, mapW, mapH },
+			player
 		);
 		this.enemyController = new EnemyController(this.c, this.grid);
 
@@ -55,40 +79,21 @@ export default class GameManager {
 	}
 
 	init() {
-		const width = 64;
-		const height = 64;
 		this.c.canvas.width = 600;
 		this.c.canvas.height = 400;
 		this.world.init();
-
-		const player = new Player(
-			this.players,
-			this.manager,
-			this.c,
-			this.camera,
-			0,
-			0,
-			{ x: 64, y: 64 },
-			width,
-			height,
-			"grey"
-		);
-		this.player = player;
-		player.init(this.socket);
-		this.world.player = player;
 	}
 
 	start() {
 		this.manager.reset();
-		this.manager.startTurn(this.players);
+		this.manager.startTurn(this.player);
 	}
 
 	update() {
 		this.c.imageSmoothingEnabled = false;
-		this.player.update();
 		// this.enemies.forEach((enemy) => enemy.update());
 		this.world.render(this.player);
-		// this.enemyController.update(this.players[0]);
+		// this.enemyController.update(this.player[0]);
 		// this.map_editor.update();
 	}
 }

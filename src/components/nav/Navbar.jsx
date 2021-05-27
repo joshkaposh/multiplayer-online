@@ -1,14 +1,12 @@
 import React from 'react';
-// import useUser from '../../context/user'
 import {NavLink} from 'react-router-dom'
 export default function Navbar() {
-
+//! canvas rendering bug occurs after going home > logout > relogging-in
     return (
         <div>
             <nav>
                 <li><NavLink to={{ pathname:'/home'}} >Home</NavLink></li>
-                <li><button href="#">Logout</button></li>
-
+                <li><NavLink to={{pathname:'/'}} >Logout</NavLink></li>
             </nav>
         </div>
     )

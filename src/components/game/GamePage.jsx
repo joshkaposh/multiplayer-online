@@ -1,23 +1,20 @@
-import React,{useState} from 'react';
-import Page from '../Page'
+import React from 'react';
+import Page from '../pages/Page'
 import Canvas from '../canvas/Canvas';
-import DisplayName from '../DisplayName'
-// import PlayerFeed from '../feed/PlayerFeed';
 import useUser from '../../context/user'
 
 
-export default function GamePage() {
+export default function GamePage({data}) {
 
     const user = useUser();
-    console.log(user);
+    // console.log(user);
+    // console.log('DATA',data);
 
     return (
         <Page content={
                 <div>
-                    <DisplayName user={user}/>
-                <Canvas />
+                    <Canvas gamedata={data} />
                 </div>
-
         } />
         
     )

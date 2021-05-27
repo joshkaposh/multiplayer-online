@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import useUser from '../../context/user';
 import Game from './game/gameManager';
@@ -6,97 +6,70 @@ import MapEditor from '../map-editor-ui/MapEditor';
 
 const socket = io('http://localhost:5000')
 
-const mouse = {
-    x: null,
-    y: null,
-    selection: null,
-}
-
-
 const game = []
 
-
-function init(name, canvasRef, mapEditorSelectFn) {
+const  init =(name, canvasRef, gamedata) => {
     const canvas = canvasRef.current;
-
     const ctx = canvas.getContext('2d');
     ctx.canvas.width = 600;
     ctx.canvas.height = 400;
 
-    const g = new Game(socket, ctx, name);
+    const g = new Game(socket, ctx, name,gamedata);
     g.init()
     game.push(g)
-    return game;
-
 }
 
-const isMouseWithinCanvas = () => {
-    const canvas = document.getElementById('canvas');
-    if (mouse.x >= 0 &&
-        mouse.x <= canvas.width &&
-        mouse.y >= 0 &&
-        mouse.y <= canvas.height
-    ) {
-        return true
-    }
-    return false;
-}
-
-function animate() {
-
-    const canvas = document.getElementById('canvas');
-    const c = canvas.getContext('2d')
-    c.clearRect(0, 0, c.canvas.width, c.canvas.height);
-    c.strokeStyle = "#000000";
-
-    socket.on("playerMove", (data) => {
-        c.fillRect(data.x, data.y, 10, 10);
-    });
-
-    game.forEach(frame => frame.update());
-
-    // isMouseWithinCanvas() ? c.fillRect(mouse.x,mouse.y,3,3) : c.stroke()
-
-    requestAnimationFrame(animate);
-
-}
-
-
-
-export default function Canvas() {
-    const [selection, setSelection] = useState('none')
+export default function Canvas({gamedata}) {
 
     const { user } = useUser()
-    console.log(user);
     const canvasRef = useRef(null)
-
-    const select = (value) => {
-        setSelection(value)
-    }
-
 
     useEffect(() => {
 
-        init(user.username, canvasRef, select)
+        let animationId;
 
+        console.log(gamedata)
 
+        const  animate = () => {
+            const canvas = document.getElementById('canvas');
+            const c = canvas.getContext('2d')
+            c.strokeStyle = "#000000";
+            c.fillStyle = '#000000'
+            c.clearRect(0, 0, c.canvas.width, c.canvas.height);
+            c.fillRect(0,0,c.canvas.width,c.canvas.height)
+            game.forEach(frame => frame.update());
+       
+            animationId = window.requestAnimationFrame(animate);
 
-        // document.addEventListener('mousemove', (e) => {
-        //     mouse.x = e.offsetX;
-        //     mouse.y = e.offsetY
-        // })
+        }
 
-
-
+        init(user.username, canvasRef, gamedata)
         animate();
 
+        return () => {
+            window.cancelAnimationFrame(animationId)
+        }
     }, []);
-
 
     return (
         <div>
+            <div className='player-info'><h2></h2></div>
             <canvas id="canvas" ref={canvasRef}></canvas>
-            <MapEditor selection={selection} setSelection={select} canvasRef={canvasRef} />
+            <MapEditor canvasRef={canvasRef} />
+            <table className='MapInfo'>
+                <thead>
+                <tr>
+                    <th>world_width</th>
+                    <th>world_height</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{gamedata.columns * gamedata.tilesize}</td>
+                    <td>{gamedata.rows * gamedata.tilesize}</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     )
 }

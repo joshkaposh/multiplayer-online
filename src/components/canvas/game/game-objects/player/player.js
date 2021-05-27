@@ -5,10 +5,9 @@ import io from "socket.io-client";
 const socket = io("http://localhost:5000");
 
 export default class Player extends PlayerMovement {
-	constructor(name, manager, c, camera, x, y, speed, width, height, color) {
-		super(name, manager, c, camera, x, y, speed);
+	constructor(name, c, camera, x, y, tilesize, speed, width, height, color) {
+		super(name, c, camera, x, y, tilesize, speed);
 		this.name = name;
-		this.manager = manager;
 		this.c = c;
 		this.x = x;
 		this.y = y;
@@ -20,57 +19,31 @@ export default class Player extends PlayerMovement {
 		this.status = "";
 		this.dirs = ["left", "right", "up", "down"];
 	}
-
-	promptUser(msg) {
-		this.status = msg;
-	}
-
-	drawSprite(img) {
-		this.c.beginPath();
-		this.c.drawImage(img, 0, 0);
-	}
-
 	draw() {
-		let x = this.camera.offsetToMiddle(
-			this.x,
-			null,
-			this.camera.x,
-			this.camera.y,
-			this.camera.width,
-			this.camera.height,
-			this.c.canvas.width,
-			this.c.canvas.height
-		);
-		let y = this.camera.offsetToMiddle(
-			null,
-			this.y,
-			this.camera.x,
-			this.camera.y,
-			this.camera.width,
-			this.camera.height,
-			this.c.canvas.width,
-			this.c.canvas.height
-		);
+		this.c.fillStyle = this.color;
+		let offset = this.tilesize / 2;
+
+		let player_x =
+			this.x -
+			this.camera.x +
+			this.c.canvas.width / 2 -
+			this.camera.width / 2 +
+			offset;
+
+		let player_y =
+			this.y -
+			this.camera.y +
+			this.c.canvas.height / 2 -
+			this.camera.height / 2 +
+			offset;
 
 		this.c.beginPath();
-		this.c.fillStyle = this.color;
-
-		this.c.fillRect(x, y, this.width, this.height);
-		// this.drawPaths();
-		// todo: get pathingSprites aligned to camera centering
-		this.drawPathSprites({
-			func: this.camera.offsetToMiddle,
-			cameraX: this.camera.x,
-			cameraY: this.camera.y,
-			cameraW: this.camera.width,
-			cameraH: this.camera.height,
-		});
-		// this.drawPreviousPaths();
+		this.c.arc(player_x, player_y, 24, 0, Math.PI * 2, false);
+		this.c.fill();
+		this.drawPathSprites(player_x, player_y);
 	}
 
 	update() {
-		// this.sprite.update(this.x, this.y);
-		// ? sprite is right arrow;
 		this.draw();
 	}
 	init() {

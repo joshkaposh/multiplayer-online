@@ -10,11 +10,22 @@ images.pathing_spritesheet.onerror = function (err) {
 images.pathing_spritesheet.src = spritesheet;
 
 export default class PathFind {
-	constructor(turnmanager, c, x, y) {
-		this.turnmanager = turnmanager;
+	constructor(c, camera, x, y, offsetX, offsetY) {
 		this.c = c;
+		this.camera = camera;
 		this.x = x;
 		this.y = y;
+		this.offsetX = offsetX;
+		this.offsetY = offsetY;
+		this.worldW = parseInt(
+			document.getElementsByClassName("MapInfo")[0].children[1]
+				.children[0].firstChild.innerText
+		);
+		this.worldH = parseInt(
+			document.getElementsByClassName("MapInfo")[0].children[1]
+				.children[0].lastChild.innerText
+		);
+
 		this.previousPositions = [];
 		this.paths = [];
 	}
@@ -60,12 +71,20 @@ export default class PathFind {
 	pathcheck(x, y, speed) {
 		const availablePaths = [];
 
-		if (x + speed.x <= 600) {
+		if (x + speed.x <= this.worldW) {
 			availablePaths.push({
 				x: x + speed.x,
 				y: y,
 				dir: "right",
 				frame: 0,
+			});
+		}
+		if (y + speed.y <= this.worldH) {
+			availablePaths.push({
+				x: x,
+				y: y + speed.y,
+				dir: "down",
+				frame: 3,
 			});
 		}
 		if (x - speed.x >= 0) {
@@ -79,14 +98,7 @@ export default class PathFind {
 		if (y - speed.y >= 0) {
 			availablePaths.push({ x: x, y: y - speed.y, dir: "up", frame: 2 });
 		}
-		if (y + speed.y <= 400) {
-			availablePaths.push({
-				x: x,
-				y: y + speed.y,
-				dir: "down",
-				frame: 3,
-			});
-		}
+
 		return availablePaths;
 	}
 
@@ -109,51 +121,28 @@ export default class PathFind {
 :	4 down arrow
 :	5 castle
 :	6 trees
-
-		this.c.drawImage(
-				images.playerSpritesheet,
-				this.width * this.frameX,
-				this.height * this.frameY,
-				this.width,
-				this.height,
-				this.x,
-				this.y,
-				this.width,
-				this.height
-			);
 */
-	drawPathSprites({ func, cameraX, cameraY, cameraW, cameraH }) {
+	drawPathSprites() {
 		this.setAvailablePaths();
-		// const xOffset = 10;
-		// const yOffset = 0;
 		const tilesize = 32;
 		const width = 64;
 		const height = 64;
 		const img = images.pathing_spritesheet;
 		if (img.complete) {
 			for (let i = 0; i < this.paths.length; i++) {
-				// let x = this.paths[i].x;
-				// let y = this.paths[i].y;
-				let x = func(
-					this.paths[i].x,
-					null,
-					cameraX,
-					cameraY,
-					cameraW,
-					cameraH,
-					this.c.canvas.width,
-					this.c.canvas.height
-				);
-				let y = func(
-					null,
-					this.paths[i].y,
-					cameraX,
-					cameraY,
-					cameraW,
-					cameraH,
-					this.c.canvas.width,
-					this.c.canvas.height
-				);
+				let x = this.paths[i].x;
+				let y = this.paths[i].y;
+
+				x =
+					this.paths[i].x -
+					this.camera.width / 2 +
+					this.c.canvas.width / 2 +
+					this.offsetX;
+				y =
+					this.paths[i].y -
+					this.camera.height / 2 +
+					this.c.canvas.height / 2 +
+					this.offsetY;
 
 				switch (this.paths[i].dir) {
 					case "up":
@@ -215,14 +204,14 @@ export default class PathFind {
 		}
 	}
 
-	drawPaths() {
-		this.setAvailablePaths();
-		for (let i = 0; i < this.paths.length; i++) {
-			const x = this.paths[i].x;
-			const y = this.paths[i].y;
-			this.c.beginPath();
-			this.c.fillStyle = "red";
-			this.c.fillRect(x, y, 60, 40);
-		}
-	}
+	// drawPaths() {
+	// 	this.setAvailablePaths();
+	// 	for (let i = 0; i < this.paths.length; i++) {
+	// 		const x = this.paths[i].x;
+	// 		const y = this.paths[i].y;
+	// 		this.c.beginPath();
+	// 		this.c.fillStyle = "red";
+	// 		this.c.fillRect(x, y, 64, 64);
+	// 	}
+	// }
 }
