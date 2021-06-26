@@ -55,11 +55,11 @@ const ioHandlers = {
 			socket.on("nameResponse", async (data) => {
 				const user = await doesUserExist(data);
 				if (user) {
-					socket.emit("oldUser", user);
+					socket.emit("oldUser", { ...data, newUser: false });
 					// askForDifferentName(socket);
 				} else {
 					models.user_model.create(data);
-					io.sockets.emit("newUser", data);
+					io.sockets.emit("newUser", { ...data, newUser: false });
 				}
 				// redirect to game
 				socket.emit("loadGame", { ...gameMap });
