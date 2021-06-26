@@ -2,7 +2,6 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import HomePage from './HomePage';
 import EstablishConnection from '../establishConnection';
-import Page from './Page'
 
 export default function Pages () {
     return (

@@ -18,12 +18,10 @@ export default class PathFind {
 		this.offsetX = offsetX;
 		this.offsetY = offsetY;
 		this.worldW = parseInt(
-			document.getElementsByClassName("MapInfo")[0].children[1]
-				.children[0].firstChild.innerText
+			document.getElementsByClassName("MapInfo")[0].children[1].children[0].firstChild.innerText
 		);
 		this.worldH = parseInt(
-			document.getElementsByClassName("MapInfo")[0].children[1]
-				.children[0].lastChild.innerText
+			document.getElementsByClassName("MapInfo")[0].children[1].children[0].lastChild.innerText
 		);
 
 		this.previousPositions = [];
@@ -133,16 +131,8 @@ export default class PathFind {
 				let x = this.paths[i].x;
 				let y = this.paths[i].y;
 
-				x =
-					this.paths[i].x -
-					this.camera.width / 2 +
-					this.c.canvas.width / 2 +
-					this.offsetX;
-				y =
-					this.paths[i].y -
-					this.camera.height / 2 +
-					this.c.canvas.height / 2 +
-					this.offsetY;
+				x = this.paths[i].x - this.camera.width / 2 + this.c.canvas.width / 2 + this.offsetX;
+				y = this.paths[i].y - this.camera.height / 2 + this.c.canvas.height / 2 + this.offsetY;
 
 				switch (this.paths[i].dir) {
 					case "up":
@@ -203,15 +193,4 @@ export default class PathFind {
 			}
 		}
 	}
-
-	// drawPaths() {
-	// 	this.setAvailablePaths();
-	// 	for (let i = 0; i < this.paths.length; i++) {
-	// 		const x = this.paths[i].x;
-	// 		const y = this.paths[i].y;
-	// 		this.c.beginPath();
-	// 		this.c.fillStyle = "red";
-	// 		this.c.fillRect(x, y, 64, 64);
-	// 	}
-	// }
 }

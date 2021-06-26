@@ -1,5 +1,7 @@
 import MapEditor from "../mapEditor";
 import spritesheet from "../../images/ground.png";
+import game_spritesheet from "../../images/game-spritesheet-2.png";
+import { frames } from "../collision/collision.js";
 
 const images = {};
 
@@ -8,15 +10,10 @@ images.ground_spritesheet = new Image();
 images.ground_spritesheet.onerror = function (err) {
 	console.error(err);
 };
-images.ground_spritesheet.src = spritesheet;
+images.ground_spritesheet.src = game_spritesheet;
 
 export default class World {
-	constructor(
-		c,
-		camera,
-		{ tilesize, rows, columns, data, mapW, mapH },
-		player
-	) {
+	constructor(c, camera, { tilesize, rows, columns, data, mapW, mapH }, player) {
 		this.c = c;
 		this.camera = camera;
 		this.player = player;
@@ -26,19 +23,13 @@ export default class World {
 		this.grid = data;
 		this.width = mapW;
 		this.height = mapH;
-
+		this.delta = 0;
 		this.mouse = {
 			x: null,
 			y: null,
 			selection: { x: null, y: null },
 		};
-		this.map_editor = new MapEditor(
-			this.c,
-			this.camera,
-			this.mouse,
-			this.tilesize,
-			this
-		);
+		this.map_editor = new MapEditor(this.c, this.camera, this.mouse, this.tilesize, this);
 		this.cellWidth = this.tilesize;
 		this.cellHeight = this.tilesize;
 
@@ -56,12 +47,7 @@ export default class World {
 		let cameraX = this.camera.x;
 		let cameraY = this.camera.y;
 
-		if (
-			x >= cameraX &&
-			x <= cameraX + this.camera.width &&
-			y >= cameraY &&
-			y <= this.camera.height
-		) {
+		if (x >= cameraX && x <= cameraX + this.camera.width && y >= cameraY && y <= this.camera.height) {
 			this.map_editor.tiles.push({
 				x: this.mouse.selection.x,
 				y: this.mouse.selection.y,
@@ -75,6 +61,8 @@ export default class World {
 	init() {
 		this.map_editor.init();
 		this.player.init();
+		this.player.collision.init(this.grid);
+
 		this.c.canvas.addEventListener("click", this.click.bind(this));
 		this.c.canvas.addEventListener("mousemove", this.mousemove.bind(this));
 	}
@@ -107,16 +95,8 @@ export default class World {
 				// draw grid within camera dimensions
 				const tile = this.getTile(x, y);
 				// !camera centering
-				let tile_x =
-					tile.x -
-					this.camera.x +
-					this.c.canvas.width / 2 -
-					this.camera.width / 2;
-				let tile_y =
-					tile.y -
-					this.camera.y +
-					this.c.canvas.height / 2 -
-					this.camera.height / 2;
+				let tile_x = tile.x - this.camera.x + this.c.canvas.width / 2 - this.camera.width / 2;
+				let tile_y = tile.y - this.camera.y + this.c.canvas.height / 2 - this.camera.height / 2;
 
 				this.c.strokeStyle = tile.strokeStyle;
 				this.c.fillStyle = tile.fillStyle;
@@ -134,23 +114,15 @@ export default class World {
 					};
 				}
 
-				const frame = tile.value - 1;
-
-				if (
-					tile.value === 23 &&
-					tile.x === this.player.x &&
-					tile.y === this.player.y
-				) {
-					console.log("youre on grass!!");
-					this.updateTileValue(x, y, tile.value + 1);
-				}
-
+				// const frame = tile.value;
+				let frameX = tile.frameX;
+				let frameY = tile.frameY;
 				this.drawSprite(
 					images.ground_spritesheet,
-					frame * this.tilesize,
-					0,
-					this.tilesize,
-					this.tilesize,
+					frameX * (this.tilesize / 2),
+					frameY * (this.tilesize / 2),
+					this.tilesize / 2,
+					this.tilesize / 2,
 					tile_x,
 					tile_y,
 					this.tilesize,
@@ -164,7 +136,7 @@ export default class World {
 		this.draw();
 	}
 
-	render() {
+	render(delta, arr) {
 		this.c.fillStyle = this.color;
 		this.c.strokeStyle = this.color;
 		this.c.beginPath();

@@ -25,7 +25,11 @@ export default function CreateUserMenu({enterName,socket}) {
             <span className='retry'>Choose a different name</span> :
             ''
         }
-        <input type="text" name="username" onChange={handleChange}/>
-        <input type="submit" value="Submit"/>
+        <div className='form-fields' >
+            <label htmlFor="username">Username: </label>
+            <input type="text" id='username' name="username" onChange={handleChange} />
+            <input type="submit" value="Submit"/>
+        </div>
+        
     </form>
 }

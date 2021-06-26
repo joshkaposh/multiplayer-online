@@ -30,7 +30,7 @@ export default function EstablishConnection() {
         })
 
         socket.on('oldUser', (data) => {
-            console.log('EstablishConnection::OldUser');
+            console.log('EstablishConnection::OldUser',data);
             setObj({ ...data });
         
         })

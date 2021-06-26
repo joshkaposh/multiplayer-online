@@ -8,21 +8,22 @@ export default class Camera {
 		this.height = height;
 		this.worldW = worldW;
 		this.worldH = worldH;
+		this.scrollSpeed = tilesize;
 		this.minX = 0;
 		this.minY = 0;
 	}
 
 	panUp() {
-		this.y -= this.tilesize;
+		this.y -= this.scrollSpeed;
 	}
 	panDown() {
-		this.y += this.tilesize;
+		this.y += this.scrollSpeed;
 	}
 	panLeft() {
-		this.x -= this.tilesize;
+		this.x -= this.scrollSpeed;
 	}
 	panRight() {
-		this.x += this.tilesize;
+		this.x += this.scrollSpeed;
 	}
 
 	offsetToMiddle(

@@ -16,7 +16,8 @@ export default function MapEditor() {
     const [selection, setSelection] = useState('none')
 
     return (
-        <div className='editor'>
+        <>
+        <div className='editor' >
             <div className='editor-selected'>
                 <h4>Current Selection: <span id='editor-selected-value'>{selection}</span> </h4>
             </div>
@@ -30,6 +31,18 @@ export default function MapEditor() {
                 <Button text={'tree'} selection={selection} setSelection={setSelection} />
                 <Button text={'castle'} selection={selection} setSelection={setSelection} />
             </div>
-        </div>
+
+
+            
+            </div>
+            <div id='current-btn'>
+                <div>
+                    <h3>Btn: <span id="btnvalue"></span> </h3>
+                    <h3>Elasped Time: <span id="timevalue"></span> </h3>
+                    
+                </div>
+                
+            </div>
+            </>
     )
 }

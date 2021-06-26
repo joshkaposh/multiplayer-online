@@ -30,12 +30,7 @@ export class TurnManager {
 }
 
 export default class GameManager {
-	constructor(
-		socket,
-		c,
-		playerName,
-		{ data: map, rows, columns, tilesize, mapW, mapH }
-	) {
+	constructor(socket, c, playerName, { data: map, rows, columns, tilesize, mapW, mapH }) {
 		this.socket = socket;
 		this.c = c;
 		this.enemies = [];
@@ -44,16 +39,7 @@ export default class GameManager {
 		this.rows = rows;
 		// this.map_editor = new MapEditor(this.c);
 		this.manager = new TurnManager(this.socket);
-		this.camera = new Camera(
-			this.c,
-			tilesize,
-			0,
-			0,
-			tilesize * 5,
-			tilesize * 5,
-			mapW,
-			mapH
-		);
+		this.camera = new Camera(this.c, tilesize, 0, 0, tilesize * 5, tilesize * 5, mapW, mapH);
 		const player = new Player(
 			playerName,
 			this.c,
@@ -61,18 +47,17 @@ export default class GameManager {
 			0,
 			0,
 			tilesize,
-			{ x: tilesize, y: tilesize },
-			tilesize,
-			tilesize,
+			{ x: Math.round(tilesize / 8), y: Math.round(tilesize / 8) },
+			(tilesize / 8) * 6,
+			(tilesize / 8) * 6,
+			mapW,
+			mapH,
+			columns,
+			rows,
 			"grey"
 		);
 
-		this.world = new World(
-			this.c,
-			this.camera,
-			{ data: map, rows, columns, tilesize, mapW, mapH },
-			player
-		);
+		this.world = new World(this.c, this.camera, { data: map, rows, columns, tilesize, mapW, mapH }, player);
 		this.enemyController = new EnemyController(this.c, this.grid);
 
 		this.turn = 0;
@@ -89,11 +74,8 @@ export default class GameManager {
 		this.manager.startTurn(this.player);
 	}
 
-	update() {
+	update(delta) {
 		this.c.imageSmoothingEnabled = false;
-		// this.enemies.forEach((enemy) => enemy.update());
-		this.world.render(this.player);
-		// this.enemyController.update(this.player[0]);
-		// this.map_editor.update();
+		this.world.render(delta, [this.player]);
 	}
 }
