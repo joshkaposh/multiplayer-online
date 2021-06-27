@@ -1,13 +1,13 @@
 import spritesheet from "../../images/spritesheet.png";
 
-const images = {};
+// const images = {};
 
-images.playerSpritesheet = new Image();
+// images.playerSpritesheet = new Image();
 
-images.playerSpritesheet.onerror = function (err) {
-	console.log(err);
-};
-images.playerSpritesheet.src = spritesheet;
+// images.playerSpritesheet.onerror = function (err) {
+// 	console.log(err);
+// };
+// images.playerSpritesheet.src = spritesheet;
 /*
 	!spritesheet indexes
 :	0 = right arrow
@@ -19,12 +19,19 @@ images.playerSpritesheet.src = spritesheet;
 :	6 trees
 */
 export default class Sprite {
-	constructor(c, x, y) {
+	constructor(c, spritesheet, x, y, width, height, frame_limit) {
 		this.c = c;
 		this.x = x;
 		this.y = y;
-		this.width = 32.0; //sprite width
-		this.height = 32.0; //sprite height
+		this.img = {};
+		this.img.spritesheet = new Image();
+		this.img.spritesheet.onerror = function (err) {
+			console.log(err);
+		};
+		this.img.spritesheet.src = spritesheet;
+		this.width = width; //sprite width
+		this.height = height; //sprite height
+		this.frame_limit = frame_limit;
 		this.frameX = 0;
 		this.frameY = 0;
 	}
@@ -33,17 +40,17 @@ export default class Sprite {
 		this.c.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
 	}
 
-	draw() {
-		if (images.playerSpritesheet.complete) {
+	draw(x, y) {
+		if (this.img.spritesheet.complete) {
 			this.c.beginPath();
 			this.c.drawImage(
-				images.playerSpritesheet,
+				this.img.spritesheet,
 				this.width * this.frameX,
 				this.height * this.frameY,
 				this.width,
 				this.height,
-				this.x,
-				this.y,
+				x,
+				y,
 				this.width,
 				this.height
 			);

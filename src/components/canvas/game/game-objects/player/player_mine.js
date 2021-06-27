@@ -16,8 +16,15 @@ class Drill {
 	constructor(c) {
 		this.c = c;
 		this.direction = null;
-		this.frameX = 0;
-		this.frameY = 0;
+		this.frame_limit = 3;
+		this.frame_loops = {
+			left: [2, 3, 2, 3],
+			right: [0, 1, 0, 1],
+			down: [4, 5, 4, 5],
+		};
+		this.current_loop_index = 0;
+		this.frameX = this.current_loop_index;
+		this.frameY = 1;
 	}
 
 	drawSprite(img, sX, sY, sW, sH, dX, dY, dW, dH) {
@@ -91,6 +98,7 @@ export default class Mine {
 	}
 
 	mine(tile, direction) {
+		if (tile === undefined) return;
 		let integrity = tile.integrity;
 		// let full = 3;
 		// let half = 1.5;

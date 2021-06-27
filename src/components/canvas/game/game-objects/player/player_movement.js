@@ -18,6 +18,7 @@ class Move extends PathFind {
 					this.camera.panUp();
 					this.offset.addY(this.speed);
 				}
+				this.facingDirection = "up";
 				this.pos.subY(this.speed);
 			},
 			keyA: () => {
@@ -25,7 +26,7 @@ class Move extends PathFind {
 					this.camera.panLeft();
 					this.offset.addX(this.speed);
 				}
-
+				this.facingDirection = "left";
 				this.pos.subX(this.speed);
 			},
 			keyS: () => {
@@ -33,7 +34,7 @@ class Move extends PathFind {
 					this.camera.panDown();
 					this.offset.subY(this.speed);
 				}
-
+				this.facingDirection = "down";
 				this.pos.addY(this.speed);
 			},
 			keyD: () => {
@@ -41,10 +42,13 @@ class Move extends PathFind {
 					this.camera.panRight();
 					this.offset.subX(this.speed);
 				}
+				this.facingDirection = "right";
 				this.pos.addX(this.speed);
 			},
 		};
 		this.isMoving = false;
+		this.isMining = false;
+
 		this.keys = {};
 		this.keysElapsed = {};
 		this.jumpHeight = this.speed.y * 2;
@@ -88,14 +92,27 @@ class Move extends PathFind {
 
 		// ? Mining Section
 		if (this.keys["KeyD"] && this.keys["Space"]) {
+			this.isMining = true;
+			this.facingDirection = "right";
+			// mining right
+			this.sprite.frameY = 1;
+			this.sprite.frameX = this.mine.drill.frame_loops["right"][0];
 			this.mine.mine(this.collision.getTile(this.pos.x + this.tilesize + this.speed.x, this.pos.y));
 		}
 
 		if (this.keys["KeyA"] && this.keys["Space"]) {
+			this.isMining = true;
+			this.facingDirection = "left";
+			this.sprite.frameY = 1;
+			this.sprite.frameX = this.mine.drill.frame_loops.left[0];
 			this.mine.mine(this.collision.getTile(this.pos.x - this.tilesize, this.pos.y));
 		}
 
 		if (this.keys["KeyS"] && this.keys["Space"]) {
+			this.facingDirection = "down";
+			this.isMining = true;
+			this.sprite.frameY = 1;
+			this.sprite.frameX = this.mine.drill.frame_loops["down"][0];
 			this.mine.mine(this.collision.getTile(this.pos.x, this.pos.y + this.tilesize + this.speed.y));
 		}
 
@@ -117,6 +134,8 @@ class Move extends PathFind {
 					return this.displayToUser("cant move past world x limit: 0");
 				}
 				if (!this.collision.collide_left([this.topLeft, this.bottomLeft], this.speed)) {
+					this.sprite.frameX = 2;
+					this.sprite.frameY = 0;
 					this.moves["keyA"]();
 				}
 				break;
@@ -126,6 +145,8 @@ class Move extends PathFind {
 					return this.displayToUser(`cant move past world y limit: ${this.worldH}`);
 				}
 				if (!this.collision.collide_down([this.bottomLeft, this.bottomRight], this.speed)) {
+					this.sprite.frameX = 3;
+					this.sprite.frameY = 0;
 					this.moves["keyS"]();
 				}
 
@@ -136,6 +157,8 @@ class Move extends PathFind {
 					return this.displayToUser(`cant move past world x limit: ${this.worldW}`);
 				}
 				if (!this.collision.collide_right([this.topRight, this.bottomRight], this.speed)) {
+					this.sprite.frameX = 1;
+					this.sprite.frameY = 0;
 					this.moves["keyD"]();
 				}
 				break;
@@ -144,6 +167,7 @@ class Move extends PathFind {
 			default:
 				break;
 		}
+		console.log(this.facingDirection);
 	}
 
 	jump() {
@@ -188,6 +212,18 @@ export default class PlayerMovement extends Move {
 			let endTime = new Date();
 
 			let timeElapsed = endTime - startTime;
+
+			if (!this.keys["keyW"] || !this.keys["keyA"] || !this.keys["keyS"] || !this.keys["keyD"]) {
+				this.isMoving = false;
+			}
+
+			if (
+				(!this.keys["keyA"] && !this.keys["Space"]) ||
+				(!this.keys["keyS"] && !this.keys["Space"]) ||
+				(!this.keys["keyD"] && !this.keys["Space"])
+			) {
+				this.isMining = false;
+			}
 
 			document.getElementById("timevalue").innerText = `${timeElapsed / 1000}`;
 
