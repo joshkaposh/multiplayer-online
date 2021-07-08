@@ -1,5 +1,3 @@
-const Map = require("./tile-map..json");
-
 const frames = {
 	walkables: {
 		sky: {
@@ -69,14 +67,13 @@ const frames = {
 
 function init() {
 	let map = [];
-
 	let rows = 100;
 	let columns = 20;
 	let tilesize = 64;
 	let width = columns * tilesize;
 	let height = rows * tilesize;
 	let frame = 0;
-	let value, integrity;
+	let value, integrity, type;
 
 	function getTile(col, row) {
 		// return Map.layers[0].data[row * Map.width + col];
@@ -89,29 +86,59 @@ function init() {
 		for (let x = 0; x < columns; x++) {
 			// set default tile values
 			value = 5;
-			integrity = 3;
+			integrity = 100;
+			type = "dirt";
 			frame = frames.edges.center; //dirt
-			if (y <= 2) {
+
+			if (y <= 3) {
 				//sky
 				frame = frames.walkables.sky;
 				integrity = 0;
 				value = 0;
+				type = "sky";
 			}
-			if (y === 3) {
+			if (y === 4) {
 				//grass
-				value = 4;
 				frame = frames.surface.center;
+				value = 4;
+				type = "grass";
+			}
+			if (y === rows / 4) {
+				integrity = 200;
+				type = "hardened_dirt_topsoil";
+				frame = {
+					col: 2,
+					row: 2,
+				};
+			}
+			if (y > rows / 4) {
+				integrity = 200;
+				type = "hardened_dirt";
+				frame = {
+					col: 1,
+					row: 2,
+				};
 			}
 
 			map.push({
 				x: x * tilesize,
 				y: y * tilesize,
+				w: tilesize,
+				h: tilesize,
 				frameX: frame.col,
 				frameY: frame.row,
 				column: x,
 				row: y,
-				value: value,
-				integrity: integrity,
+				value,
+				type,
+				integrity,
+				integPercents: {
+					0: 0,
+					25: integrity / 4,
+					50: integrity / 2,
+					75: integrity / 4 + integrity / 2,
+					100: integrity,
+				},
 			});
 		}
 	}
