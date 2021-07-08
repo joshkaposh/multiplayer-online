@@ -1,7 +1,7 @@
 import Player from "./game-objects/player/player";
-import EnemyController from "./game-objects/enemy/enemyController";
 import Camera from "./render/camera";
 import World from "./map/world";
+import Vector from "./game-objects/basic/Vector";
 
 export class TurnManager {
 	constructor(socket) {
@@ -37,29 +37,37 @@ export default class GameManager {
 		this.tilesize = tilesize;
 		this.columns = columns;
 		this.rows = rows;
-		// this.map_editor = new MapEditor(this.c);
-		this.manager = new TurnManager(this.socket);
-		this.camera = new Camera(this.c, tilesize, 0, 0, tilesize * 5, tilesize * 5, mapW, mapH);
+		const playerWidth = (tilesize / 8) * 4;
+		const playerHeight = (tilesize / 8) * 6;
+		const playerPosition = new Vector(mapW / 2, tilesize * 3 - playerHeight);
+		const cameraPosition = new Vector(mapW / 2, 0);
+		const camera = new Camera(
+			this.c,
+			cameraPosition,
+			c.canvas.width,
+			c.canvas.height,
+			tilesize,
+			columns,
+			rows,
+			mapW,
+			mapH
+		);
 		const player = new Player(
 			playerName,
 			this.c,
-			this.camera,
-			0,
-			0,
+			camera,
+			playerPosition,
 			tilesize,
-			{ x: Math.round(tilesize / 8), y: Math.round(tilesize / 8) },
-			(tilesize / 8) * 6,
-			(tilesize / 8) * 6,
+			new Vector(8, 8),
+			playerWidth,
+			playerHeight,
 			mapW,
 			mapH,
 			columns,
 			rows,
 			"grey"
 		);
-
-		this.world = new World(this.c, this.camera, { data: map, rows, columns, tilesize, mapW, mapH }, player);
-		this.enemyController = new EnemyController(this.c, this.grid);
-
+		this.world = new World(this.c, camera, { data: map, rows, columns, tilesize, mapW, mapH }, player);
 		this.turn = 0;
 	}
 
@@ -67,11 +75,6 @@ export default class GameManager {
 		this.c.canvas.width = 600;
 		this.c.canvas.height = 400;
 		this.world.init();
-	}
-
-	start() {
-		this.manager.reset();
-		this.manager.startTurn(this.player);
 	}
 
 	update(delta) {

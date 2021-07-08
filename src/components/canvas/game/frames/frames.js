@@ -1,4 +1,4 @@
-export default {
+const frames = {
 	mined: {
 		dirt: {
 			col: 1,
@@ -73,3 +73,4 @@ export default {
 		},
 	},
 };
+export default frames;

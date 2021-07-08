@@ -55,7 +55,9 @@ nav {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	max-height: 50px;
+	flex-direction: row;
+
+	/* max-height: 50px; */
 }
 
 /** Player Info **/

@@ -5,76 +5,45 @@ import Game from './game/gameManager';
 import MapEditor from '../map-editor-ui/MapEditor';
 
 const socket = io('http://localhost:5000')
-
 const game = []
 
-let delta = 0;
-
-const  init =(name, canvasRef, gamedata) => {
+const init = (name, canvasRef, gamedata, then) => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    ctx.canvas.width = 600;
-    ctx.canvas.height = 400;
-
-    console.log(name)
-
     const g = new Game(socket, ctx, name,gamedata);
     g.init()
     game.push(g)
 }
 
-function reset() {
-    delta = 0;
-}
+const  PlayerInfo = ({className}) => <div className={className}><h2>{""}</h2></div>
 
 export default function Canvas({gamedata}) {
-
     const { user } = useUser()
     const canvasRef = useRef(null)
 
     useEffect(() => {
+        const canvas = document.getElementById('canvas');
+        const c = canvas.getContext('2d')
 
-        let animationId;
+        let lastFrameTime, animationId, fps;
 
-        var lastFrameTimeMs = 0, // The last time the loop was run
-       maxFPS = 30; // The maximum FPS we want to allow
-        let timestep = 1000 / 60
-        let numUpdateSteps = 0;
         console.log(gamedata)
 
-        const animate = (timestamp) => {
-            const canvas = document.getElementById('canvas');
-            const c = canvas.getContext('2d')
-            c.strokeStyle = "#000000";
-            c.fillStyle = '#000000'
+        const animate = () => {
             c.clearRect(0, 0, c.canvas.width, c.canvas.height);
-            c.fillRect(0, 0, c.canvas.width, c.canvas.height)
             
-            // // throttle the frame rate.
-            // if (timestamp < lastFrameTimeMs + (1000 / maxFPS)) {
-            //     requestAnimationFrame(animate);
-            //     return () => {
-            //         window.cancelAnimationFrame(animationId)
-            //     }
-            // }
+            if (!lastFrameTime) {
+                lastFrameTime = performance.now();
+                fps = 0;
+                requestAnimationFrame(animate)
+                return;
+            }
 
-            // Track the accumulated time that hasn't been simulated yet
-            // delta += timestamp - lastFrameTimeMs;
+            let delta = (performance.now() - lastFrameTime)/1000;
+            lastFrameTime = performance.now();
+
+            game.forEach(frame => frame.update(delta))
             
-            // Simulate the total elapsed time in fixed-suze chunks
-            // while (delta >= timestep) {
-            //     delta -= timestep;
-
-            //     // Sanity check
-            //     if (++numUpdateSteps >= 240) {
-            //         reset();
-            //         break;
-            //     }
-                
-            // }
-
-            game.forEach(frame => frame.update())
-
             animationId = window.requestAnimationFrame(animate);
         }
 
@@ -82,14 +51,19 @@ export default function Canvas({gamedata}) {
         animate();
 
         return () => {
+            lastFrameTime =0;
+            fps = 0;
             window.cancelAnimationFrame(animationId)
         }
-    }, []);
+    }, [gamedata, user.username]);
 
     return (
         <div>
-            <div className='player-info'><h2></h2></div>
-            <div className='player-stats'><h2 id="score"></h2></div>
+            <PlayerInfo className='player-info' />
+            <div className='player-stats'>
+                <h2>Player Status: <span id="status"></span></h2>
+
+            </div>
 
             <canvas id="canvas" ref={canvasRef}></canvas>
             <MapEditor canvasRef={canvasRef} />
