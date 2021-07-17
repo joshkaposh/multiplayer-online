@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const connectToDatabase = () => {
 	return new Promise((res, rej) => {
 		// ! important: connect to online db instead of local
-		mongoose.connect("mongodb://localhost:27888/multiplayer_online", {
+		mongoose.connect("mongodb://localhost:27017/multiplayer_online", {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 		});

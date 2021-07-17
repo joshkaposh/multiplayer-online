@@ -1,26 +1,130 @@
-{ "frames": [
-   {
-    "filename": "spritesheet.png",
-    "frame": { "x": 0, "y": 0, "w": 320, "h": 32 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 320, "h": 32 },
-    "sourceSize": { "w": 320, "h": 32 },
-    "duration": 100
-   }
- ],
- "meta": {
-  "app": "http://www.aseprite.org/",
-  "version": "1.2.27",
-  "format": "RGBA8888",
-  "size": { "w": 320, "h": 32 },
-  "scale": "1",
-  "frameTags": [
-  ],
-  "layers": [
-   { "name": "Layer", "opacity": 255, "blendMode": "normal" }
-  ],
-  "slices": [
-  ]
- }
+{
+    "frames": {
+        "walkables": {
+            "sky": { "col": 0, "row": 0 },
+            "mined_ground": { "col": 1, "row": 0 }
+        },
+        "grass": {
+            "default": { "col": 0, "row": 1 },
+            "top_right": { "col": 1, "row": 1 },
+            "top_left": { "col": 2, "row": 1 },
+            "both_right": { "col": 3, "row": 1 },
+            "both_left": { "col": 4, "row": 1 },
+            "both_under": { "col": 5, "row": 1},
+            "all": {"col": 6, "row": 1},
+            "breaking": {
+                "default": {
+                    "0": { "col": 0, "row": 7},
+                    "1": { "col": 1, "row": 7},
+                    "2": { "col": 2, "row": 7},
+                    "3": { "col": 3, "row": 7}
+                },
+                "top_right": {
+                    "0": { "col": 0, "row": 8},
+                    "1": { "col": 1, "row": 8},
+                    "2": { "col": 2, "row": 8},
+                    "3": { "col": 3, "row": 8}
+                },
+                "top_left": {
+                    "0": { "col": 0, "row": 9},
+                    "1": { "col": 1, "row": 9},
+                    "2": { "col": 2, "row": 9},
+                    "3": { "col": 3, "row": 9}
+                },
+                "both_corners": {
+                    "0": { "col": 0, "row": 10 },
+                    "1": { "col": 1, "row": 10 },
+                    "2": { "col": 2, "row": 10 },
+                    "3": { "col": 3, "row": 10 }
+                }
+            }
+        },
+        "dirt": {
+            "default": { "col": 0, "row": 2 },
+            "edges": {
+                "right": { "col": 0, "row": 4 },
+                "left": { "col": 1, "row": 4 },
+                "top": { "col": 2, "row": 4 },
+                "bottom": { "col": 3, "row": 4 }
+            },
+            "corners": {
+                "top_right": { "col": 0, "row": 5 },
+                "top_left": { "col": 1, "row": 5 },
+                "bottom_right": { "col": 2, "row": 5 },
+                "bottom_left": { "col": 3, "row": 5 },
+                "both_left": { "col": 0, "row": 6 },
+                "both_right": { "col": 1, "row": 6 },
+                "both_top": { "col": 2, "row": 6 },
+                "both_bottom": { "col": 3, "row": 6 }
+            },
+            "breaking": {
+                "0": { "col": 0, "row": 11 },
+                "1": { "col": 1, "row": 11 },
+                "2": { "col": 2, "row": 11 },
+                "3": { "col": 3, "row": 11 }
+            }
+        },
+        "hardened_dirt": {
+            "default": {
+                "col": 1,
+                "row": 2
+            },
+            "topsoil": {
+                "col": 2,
+                "row": 2
+            },
+            "edges": {
+                "right": { "col": 4, "row": 4},
+                "left": { "col": 5, "row": 4},
+                "top": { "col": 6, "row": 4},
+                "bottom": { "col": 7, "row": 4}
+            },
+            "corners": {
+                "top_right": { "col": 4, "row": 5},
+                "top_left": { "col": 5, "row": 5},
+                "bottom_right": { "col": 6, "row": 5},
+                "bottom_left": { "col": 7, "row": 5},
+               "both_left": { "col": 4, "row": 6},
+               "both_right": { "col": 5, "row": 6},
+               "both_top": { "col": 6, "row": 6},
+               "both_bottom": { "col": 7, "row": 6}
+            },
+            "breaking": {
+                "0": { "col": 0, "row": 12 },
+                "1": { "col": 1, "row": 12 },
+                "2": { "col": 2, "row": 12 },
+                "3": { "col": 3, "row": 12 }
+            }
+        },
+        "ores": {
+            "copper": {
+                "label": "copper_ore",
+                "default": {
+                    "col": 0,
+                    "row": 3
+                },
+                "breaking": {
+                    "0": { "col": 0, "row": 13 },
+                    "1": { "col": 1, "row": 13 },
+                    "2": { "col": 2, "row": 13 },
+                    "3": { "col": 3, "row": 13 }
+                }
+            },
+            "iron": {
+                "label": "iron_ore",
+                "default": {
+                    "col": 1,
+                    "row": 3
+                },
+                "breaking": {
+                    "0": { "col": 0, "row": 14 },
+                    "1": { "col": 1, "row": 14 },
+                    "2": { "col": 2, "row": 14 },
+                    "3": { "col": 3, "row": 14 }
+                }
+            }
+        }
+    }
+
+    
 }
