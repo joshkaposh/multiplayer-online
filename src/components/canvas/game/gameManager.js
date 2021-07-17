@@ -2,6 +2,7 @@ import Player from "./game-objects/player/player";
 import Camera from "./render/camera";
 import World from "./map/world";
 import Vector from "./game-objects/basic/Vector";
+import { frames } from "./frames/frames.json";
 
 export class TurnManager {
 	constructor(socket) {
@@ -30,13 +31,14 @@ export class TurnManager {
 }
 
 export default class GameManager {
-	constructor(socket, c, playerName, { data: map, rows, columns, tilesize, mapW, mapH }) {
+	constructor(socket, c, playerName, { data: map, rows, columns, tilesize, mapW, mapH, frames }) {
 		this.socket = socket;
 		this.c = c;
 		this.enemies = [];
 		this.tilesize = tilesize;
 		this.columns = columns;
 		this.rows = rows;
+		this.frames = frames;
 		const playerWidth = (tilesize / 8) * 4;
 		const playerHeight = (tilesize / 8) * 6;
 		const playerPosition = new Vector(mapW / 2, tilesize * 3 - playerHeight);
@@ -65,6 +67,7 @@ export default class GameManager {
 			mapH,
 			columns,
 			rows,
+			frames,
 			"grey"
 		);
 		this.world = new World(this.c, camera, { data: map, rows, columns, tilesize, mapW, mapH }, player);
@@ -74,6 +77,14 @@ export default class GameManager {
 	init() {
 		this.c.canvas.width = 600;
 		this.c.canvas.height = 400;
+		const canvas = document.getElementById("canvas");
+		canvas.style.position = "absolute";
+
+		console.log(this.frames);
+		frames = this.frames;
+		// canvas.style.left = window.innerWidth / 2 - this.c.canvas.width / 2;
+		// canvas.style.top = window.innerHeight / 2 - this.c.canvas.height / 2;
+
 		this.world.init();
 	}
 

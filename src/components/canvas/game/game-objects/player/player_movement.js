@@ -4,11 +4,26 @@ import Util from "../../collision/util";
 import Vector from "../basic/Vector";
 
 class Move {
-	constructor(c, spritesheet, speed, columns, rows, mapW, mapH, tilesize) {
+	constructor(c, inventory, spritesheet, speed, columns, rows, mapW, mapH, tilesize, tileFrames) {
 		this.speed = speed;
 		this.tilesize = tilesize;
+		this.inventory = inventory;
 		this.collision = new Collision(speed, tilesize, columns, rows, mapW, mapH);
-		this.drill = new Mine(c, this.collision, spritesheet, 48, 48, speed, tilesize, columns, rows, mapW, mapH);
+		this.drill = new Mine(
+			c,
+			this.inventory,
+			this.collision,
+			spritesheet,
+			48,
+			48,
+			speed,
+			tilesize,
+			columns,
+			rows,
+			mapW,
+			mapH,
+			tileFrames
+		);
 		this.reach = 10;
 		this.moves = {
 			keyW: (vector) => {
@@ -125,7 +140,7 @@ class Move {
 				this.facingDirection = "right";
 				this.drill.sprite.frameY = this.drill.sprite.frameYs["right"];
 				this.drill.sprite.frameX = this.drill.sprite.frame_loops["right"][0];
-				this.drill.mine(t, this.facingDirection, this.delta);
+				this.drill.mine(t, this.delta, this.inventory.add.bind(this.inventory));
 			}
 		}
 		if (this.keys["KeyA"] && this.keys["Space"] && canMine) {
@@ -136,7 +151,7 @@ class Move {
 				this.facingDirection = "left";
 				this.drill.sprite.frameY = this.drill.sprite.frameYs["left"];
 				this.drill.sprite.frameX = this.drill.sprite.frame_loops["left"][0];
-				this.drill.mine(t, this.facingDirection, this.delta);
+				this.drill.mine(t, this.delta, this.inventory.add.bind(this.inventory));
 			}
 		}
 		if (this.keys["KeyS"] && this.keys["Space"] && canMine) {
@@ -147,21 +162,34 @@ class Move {
 				this.facingDirection = t.x + t.w / 2 < this.pos.x + this.width / 2 ? "left" : "right";
 				this.drill.sprite.frameY = this.drill.sprite.frameYs[`down${this.facingDirection}`];
 				this.drill.sprite.frameX = this.drill.sprite.frame_loops[`down${this.facingDirection}`][0];
-				this.drill.mine(t, this.facingDirection, this.delta);
+				this.drill.mine(t, this.delta, this.inventory.add.bind(this.inventory));
 			}
 		}
 	}
 }
 
 export default class PlayerMovement extends Move {
-	constructor(c, camera, spritesheet, x, y, width, height, tilesize, speed, mapW, mapH, columns, rows) {
-		super(c, spritesheet, speed, columns, rows, mapW, mapH, tilesize);
+	constructor(
+		c,
+		inventory,
+		camera,
+		spritesheet,
+		width,
+		height,
+		tilesize,
+		speed,
+		mapW,
+		mapH,
+		columns,
+		rows,
+		tileFrames
+	) {
+		super(c, inventory, spritesheet, speed, columns, rows, mapW, mapH, tilesize, tileFrames);
 		this.c = c;
 		this.camera = camera;
 		this.width = width;
 		this.height = height;
-		this.x = x;
-		this.y = y;
+
 		this.tilesize = tilesize;
 	}
 

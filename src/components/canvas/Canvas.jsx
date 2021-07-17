@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import useUser from '../../context/user';
 import Game from './game/gameManager';
 import MapEditor from '../map-editor-ui/MapEditor';
-
+import Inventory from '../PlayerInventory';
 const socket = io('http://localhost:5000')
 const game = []
 
@@ -67,6 +67,7 @@ export default function Canvas({gamedata}) {
 
             <canvas id="canvas" ref={canvasRef}></canvas>
             <MapEditor canvasRef={canvasRef} />
+            <Inventory />
             <table className='MapInfo'>
                 <thead>
                 <tr>

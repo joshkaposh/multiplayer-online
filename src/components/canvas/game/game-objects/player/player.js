@@ -1,4 +1,5 @@
 import PlayerMovement from "./player_movement";
+import Inventory from "./player_inventory";
 import io from "socket.io-client";
 import Vector from "../basic/Vector";
 import playerSpritesheet from "../../../images/player-spritesheet.png";
@@ -6,13 +7,12 @@ import playerSpritesheet from "../../../images/player-spritesheet.png";
 const socket = io("http://localhost:5000");
 
 export default class Player extends PlayerMovement {
-	constructor(name, c, camera, pos, tilesize, speed, width, height, mapW, mapH, columns, rows, color) {
+	constructor(name, c, camera, pos, tilesize, speed, width, height, mapW, mapH, columns, rows, tileFrames, color) {
 		super(
 			c,
+			new Inventory(c),
 			camera,
 			playerSpritesheet,
-			pos.x,
-			pos.y,
 			width,
 			height,
 			tilesize,
@@ -21,8 +21,10 @@ export default class Player extends PlayerMovement {
 			mapH,
 			columns,
 			rows,
+			tileFrames,
 			color
 		);
+		console.log(tileFrames);
 		this.name = name;
 		this.c = c;
 		this.pos = pos;
@@ -34,6 +36,7 @@ export default class Player extends PlayerMovement {
 		this.facingDirection = "";
 		this.status = "";
 		this.delta = null;
+		this.test = 0;
 	}
 
 	displayToUser(msg) {
@@ -89,9 +92,14 @@ export default class Player extends PlayerMovement {
 		}
 
 		this.status = status;
+
+		// TODO: check if player is in shop tile AND is grounded
+		this.inventory.updateUI();
 		// ! world.render handles drawing
 	}
+
 	init() {
 		this.attachKeyListener(socket);
+		this.inventory.init();
 	}
 }

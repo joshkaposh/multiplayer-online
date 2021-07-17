@@ -77,5 +77,6 @@ export default class World {
 		this.camera.update(this.player);
 		this.player.update(delta);
 		this.update();
+		this.player.inventory.drawMoney();
 	}
 }
