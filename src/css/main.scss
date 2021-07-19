@@ -1,3 +1,20 @@
+$gameWidth: 600px;
+$gameHeight: 400px;
+$center: translate(-50%, 0);
+
+$sellBtnColor: rgb(235, 235, 235);
+$sellBtnBg: rgb(76, 158, 76);
+$sellBtnBorder: 2px solid rgb(14, 139, 14);
+
+$sellBtnBgHovered: rgb(81, 182, 81);
+$sellBtnBorderHovered: 2px solid rgb(18, 163, 18);
+
+$sellColor: white;
+$buyColor: white;
+
+$inventoryBorder: 2px solid rgba(0, 0, 0, 0.8);
+$sellItemBorder: 1px solid rgba(0, 0, 0, 0.8);
+
 body {
 	margin: 0;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
@@ -39,26 +56,26 @@ nav {
 
 .container {
 	position: relative;
-}
 
-#canvas {
-	position: absolute;
-	margin: 0 auto;
-	left: 50%;
-	transform: translate(-50%, 0);
-	z-index: 10;
+	#canvas {
+		position: absolute;
+		margin: 0 auto;
+		left: 50%;
+		transform: $center;
+		z-index: 10;
+	}
 }
 
 #inventory {
 	position: absolute;
 	margin: 0 auto;
 	left: 50%;
-	transform: translate(-50%, 0);
-	width: 600px;
-	height: 400px;
-	border: 1px solid black;
-	background-color: grey;
+	transform: $center;
+	width: $gameWidth;
+	height: $gameHeight;
+	background-color: hsla(360, 120, 0, 0.7);
 	z-index: 100;
+	// color: white;
 }
 
 .inventory-closed {
@@ -79,91 +96,88 @@ nav {
 .inventory-nav {
 	display: flex;
 	flex-direction: row-reverse;
-	background-color: lightskyblue;
+	border-bottom: $inventoryBorder;
+
+	.inventory-nav-list {
+		display: flex;
+		align-self: center;
+		align-items: center;
+		padding: 0 1rem;
+		width: 100%;
+
+		.inventory-nav-item {
+			margin: 0 2rem;
+		}
+		.inventory-nav-item:first-child {
+			margin: 0 2rem 0 auto;
+		}
+		#inventory-exit {
+			margin-left: auto;
+			background-color: rgb(133, 4, 4);
+			color: rgb(240, 6, 6);
+			border: 1px solid rgb(240, 6, 6);
+			border-radius: 5px;
+		}
+		#inventory-exit:hover {
+			background-color: rgb(168, 5, 5);
+			color: rgb(255, 95, 95);
+			border: 1px solid rgb(255, 95, 95);
+		}
+	}
 }
 
-.inventory-nav-list {
-	display: flex;
-	align-self: center;
-	align-items: center;
-	padding: 0 1rem;
-	width: 100%;
-}
-
-.inventory-nav-item {
-	margin: 0 2rem;
-}
-
-.inventory-nav-item:first-child {
-	margin: 0 2rem 0 auto;
-}
-
-#inventory-exit {
-	margin-left: auto;
-	background-color: rgb(133, 4, 4);
-	color: rgb(240, 6, 6);
-	border: 1px solid rgb(240, 6, 6);
-	border-radius: 5px;
-}
-
-#inventory-exit:hover {
-	background-color: rgb(168, 5, 5);
-	color: rgb(255, 95, 95);
-	border: 1px solid rgb(255, 95, 95);
-}
-
-.sell-section {
-	background-color: lightcoral;
-	width: 50%;
-}
 .buy-section {
-	background-color: lightgreen;
-	width: 50%;
-}
-
-.sell-header {
+	color: $buyColor;
+	min-width: 50%;
 	padding-top: 0.5rem;
 }
 
-.sell-list {
-	margin: 0;
-	padding: 0;
-	max-height: 100%;
-	max-width: 90%;
-	display: flex;
-	flex-direction: column;
-}
+.sell-section {
+	color: $sellColor;
+	min-width: 50%;
+	border-right: $inventoryBorder;
+	padding-top: 0.5rem;
 
-.sell-list-item-info {
-	display: flex;
-	flex-direction: column;
-	width: 80%;
-}
+	.sell-list {
+		margin: 0;
+		padding: 0;
+		max-height: 100%;
+		max-width: 90%;
+		display: flex;
+		flex-direction: column;
 
-.sell-list-item-info > * {
-	width: 50%;
-	margin: 0 auto;
-}
-
-.sell-list-item {
-	display: inline-flex;
-	margin-top: 0.5rem;
-	padding: 0.25rem 0 0.25rem 1rem;
-	align-items: center;
-	font-size: 15px;
-}
-
-.sell-btn {
-	margin-top: 0.5rem;
-	padding: 0.25rem 0.5rem;
-	border-radius: 5px;
-	max-height: 2rem;
-	background-color: rgb(99, 194, 99);
-	border: 2px solid rgb(12, 155, 12);
-}
-.sell-btn:hover {
-	background-color: rgb(108, 219, 108);
-	border: 2px solid rgb(15, 182, 15);
+		.sell-list-item-info {
+			display: flex;
+			flex-direction: column;
+			width: 80%;
+		}
+		.sell-list-item-info > * {
+			width: 50%;
+			// margin: 0 auto;
+		}
+		.sell-list-item {
+			display: inline-flex;
+			margin-top: 0.5rem;
+			margin-left: 0.5rem;
+			padding: 0.25rem 0 0.25rem 1rem;
+			align-items: center;
+			font-size: 15px;
+			border-bottom: $sellItemBorder;
+		}
+		.sell-btn {
+			margin-top: 0.5rem;
+			padding: 0.25rem 0.5rem;
+			border-radius: 5px;
+			max-height: 2rem;
+			color: $sellBtnColor;
+			background-color: $sellBtnBg;
+			border: $sellBtnBorder;
+		}
+		.sell-btn:hover {
+			background-color: $sellBtnBgHovered;
+			border: $sellBtnBorderHovered;
+		}
+	}
 }
 
 /** Map Info */
@@ -211,7 +225,6 @@ nav {
 }
 
 /** Player-Info Animation  **/
-
 .visible {
 	height: auto;
 	width: auto;
@@ -223,7 +236,6 @@ nav {
 	height: auto;
 	width: auto;
 	transition: all ease-in-out 100ms;
-
 	transform: translate(-50%, -100%);
 }
 
@@ -242,10 +254,10 @@ nav {
 	border: 1px solid black;
 	border-radius: 0 0 15px 15px;
 	padding: 1rem 3rem 5rem;
-}
 
-.form-fields label {
-	margin-top: 2rem;
+	label {
+		margin-top: 2rem;
+	}
 }
 
 .form-fields :is(input[type="text"]) {
@@ -285,11 +297,11 @@ nav {
 	border: 1px solid grey;
 	border-radius: 0 0 5px 0;
 	background-color: white;
-}
 
-.editor-selected h4 {
-	margin: 0;
-	padding: 0;
+	h4 {
+		margin: 0;
+		padding: 0;
+	}
 }
 
 .editor-buttons {

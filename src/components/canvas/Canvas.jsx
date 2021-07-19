@@ -62,26 +62,16 @@ export default function Canvas({gamedata}) {
             <PlayerInfo className='player-info' />
             <div className='player-stats'>
                 <h2>Player Status: <span id="status"></span></h2>
-
+                <h2><span id="position"></span></h2>
             </div>
 
-            <canvas id="canvas" ref={canvasRef}></canvas>
-            <MapEditor canvasRef={canvasRef} />
-            <Inventory />
-            <table className='MapInfo'>
-                <thead>
-                <tr>
-                    <th >world_width</th>
-                    <th>world_height</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td id='world-width'>{gamedata.columns * gamedata.tilesize}</td>
-                    <td id='world-height'>{gamedata.rows * gamedata.tilesize}</td>
-                </tr>
-                </tbody>
-            </table>
+            {/* <MapEditor canvasRef={canvasRef} /> */}
+            
+            <div className='container'>
+                <canvas id="canvas" ref={canvasRef}></canvas>
+                <Inventory />
+           </div>
+          
         </div>
     )
 }

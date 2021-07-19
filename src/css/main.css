@@ -1,0 +1,286 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+
+li {
+  list-style: none;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 3rem;
+  background: pink;
+}
+
+/** Canvas */
+.container {
+  position: relative;
+}
+.container #canvas {
+  position: absolute;
+  margin: 0 auto;
+  left: 50%;
+  transform: translate(-50%, 0);
+  z-index: 10;
+}
+
+#inventory {
+  position: absolute;
+  margin: 0 auto;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 600px;
+  height: 400px;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+}
+
+.inventory-closed {
+  display: none;
+}
+
+.inventory-open {
+  display: flex;
+  flex-direction: column;
+}
+
+.inventory-sections {
+  display: flex;
+  flex-direction: row-reverse;
+  height: 100%;
+}
+
+.inventory-nav {
+  display: flex;
+  flex-direction: row-reverse;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.8);
+}
+.inventory-nav .inventory-nav-list {
+  display: flex;
+  align-self: center;
+  align-items: center;
+  padding: 0 1rem;
+  width: 100%;
+}
+.inventory-nav .inventory-nav-list .inventory-nav-item {
+  margin: 0 2rem;
+}
+.inventory-nav .inventory-nav-list .inventory-nav-item:first-child {
+  margin: 0 2rem 0 auto;
+}
+.inventory-nav .inventory-nav-list #inventory-exit {
+  margin-left: auto;
+  background-color: #850404;
+  color: #f00606;
+  border: 1px solid #f00606;
+  border-radius: 5px;
+}
+.inventory-nav .inventory-nav-list #inventory-exit:hover {
+  background-color: #a80505;
+  color: #ff5f5f;
+  border: 1px solid #ff5f5f;
+}
+
+.buy-section {
+  color: white;
+  min-width: 50%;
+  padding-top: 0.5rem;
+}
+
+.sell-section {
+  color: white;
+  min-width: 50%;
+  border-right: 2px solid rgba(0, 0, 0, 0.8);
+  padding-top: 0.5rem;
+}
+.sell-section .sell-list {
+  margin: 0;
+  padding: 0;
+  max-height: 100%;
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+}
+.sell-section .sell-list .sell-list-item-info {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+}
+.sell-section .sell-list .sell-list-item-info > * {
+  width: 50%;
+}
+.sell-section .sell-list .sell-list-item {
+  display: inline-flex;
+  margin-top: 0.5rem;
+  margin-left: 0.5rem;
+  padding: 0.25rem 0 0.25rem 1rem;
+  align-items: center;
+  font-size: 15px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+}
+.sell-section .sell-list .sell-btn {
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 5px;
+  max-height: 2rem;
+  color: #ebebeb;
+  background-color: #4c9e4c;
+  border: 2px solid #0e8b0e;
+}
+.sell-section .sell-list .sell-btn:hover {
+  background-color: #51b651;
+  border: 2px solid #12a312;
+}
+
+/** Map Info */
+.editor {
+  display: none;
+}
+
+.MapInfo {
+  /* display: none; */
+  border: 1px solid grey;
+}
+
+/** Player Score  */
+.player-stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  /* max-height: 50px; */
+}
+
+/** Player Info **/
+.player-info > * {
+  display: inline;
+  font-weight: 400;
+  letter-spacing: 0.25mm;
+}
+
+.player-info {
+  display: none;
+  position: fixed;
+  left: 50%;
+  top: 0%;
+  transform: translate(-50%, 0);
+  height: auto;
+  width: auto;
+  background-color: #313131;
+  color: #cecece;
+  padding: 1rem 1rem 0.5rem;
+  border-radius: 0 0 25px 25px;
+}
+
+/** Player-Info Animation  **/
+.visible {
+  height: auto;
+  width: auto;
+  transition: all ease-in-out 100ms;
+  transform: translate(-50%, 0);
+}
+
+.invisible {
+  height: auto;
+  width: auto;
+  transition: all ease-in-out 100ms;
+  transform: translate(-50%, -100%);
+}
+
+#displayName {
+  position: absolute;
+}
+
+/** Create User Menu */
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  width: 25%;
+  justify-content: center;
+  margin: 0 auto;
+  border: 1px solid black;
+  border-radius: 0 0 15px 15px;
+  padding: 1rem 3rem 5rem;
+}
+.form-fields label {
+  margin-top: 2rem;
+}
+
+.form-fields :is(input[type=text]) {
+  width: 80%;
+  margin: 0.25rem auto 0;
+}
+
+.form-fields :is(input[type=submit]) {
+  width: 50%;
+  margin: 3rem auto 0;
+  border-radius: 10px;
+  border: none;
+  padding: 0.5rem 0.75rem;
+}
+
+.form-fields :is(input[type=submit]):hover {
+  border: 2px solid lightblue;
+}
+
+.retry {
+  font-size: 14px;
+  color: #f00606;
+  padding-right: 0.5rem;
+}
+
+/*?-- Map Editor Section --?*/
+.editor {
+  width: 60vw;
+  margin: 0 auto;
+  background-color: antiquewhite;
+}
+
+.editor-selected {
+  margin: 0;
+  width: 50%;
+  border: 1px solid grey;
+  border-radius: 0 0 5px 0;
+  background-color: white;
+}
+.editor-selected h4 {
+  margin: 0;
+  padding: 0;
+}
+
+.editor-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: orange;
+}
+
+.editor-button {
+  margin: 0;
+  margin-right: 1rem;
+  padding: 0.5rem 1.25rem;
+}
+
+/*# sourceMappingURL=main.css.map */

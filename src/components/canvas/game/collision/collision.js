@@ -48,16 +48,12 @@ export default class PlayerCollision {
 		//checks adjecent tile top border
 		let bool = false;
 
-		// console.log(corners);
-
 		for (let i = 0; i < corners.length; i++) {
 			let tile = this.getTile(
 				Math.floor(corners[i].x / this.tilesize),
 				Math.floor(corners[i].y / this.tilesize),
 				true
 			);
-
-			// console.log(tile);
 
 			if (corners[i].y > tile.y && corners[i].x > tile.x && corners[i].x < tile.x + this.tilesize) {
 				if (tile.value !== 0) {

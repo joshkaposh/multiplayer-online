@@ -1,5 +1,6 @@
 import game_spritesheet from "../../images/game-spritesheet-new.png";
-
+import Vector from "../game-objects/basic/Vector";
+import Shop from "../game-objects/shop/shop";
 const images = {};
 
 images.spritesheet = new Image();
@@ -19,6 +20,11 @@ export default class World {
 		this.grid = data;
 		this.width = mapW;
 		this.height = mapH;
+		const shopHeight = tilesize * 2;
+		const shopWidth = tilesize * 4;
+		const shopPos = new Vector(mapW / 2, tilesize * 2);
+		this.shop = new Shop(c, shopPos, shopWidth, shopHeight, "grey");
+		this.layers = [data, [this.shop]];
 		this.delta = 0;
 		this.mouse = {
 			x: null,
@@ -66,6 +72,7 @@ export default class World {
 				);
 			}
 		}
+
 		this.player.draw();
 	}
 
@@ -75,8 +82,9 @@ export default class World {
 
 	render(delta) {
 		this.camera.update(this.player);
-		this.player.update(delta);
+		this.player.update(delta, this.shop);
 		this.update();
+		this.shop.update(this.camera);
 		this.player.inventory.drawMoney();
 	}
 }

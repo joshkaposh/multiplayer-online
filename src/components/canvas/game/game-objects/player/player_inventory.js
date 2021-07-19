@@ -18,6 +18,11 @@ export default class Inventory {
 			const btn = document.getElementsByClassName(key + "-sell")[0];
 			btn.addEventListener("click", this.sell.bind(this, key));
 		});
+		const exitBtn = document.getElementById("inventory-exit");
+		exitBtn.addEventListener("click", (e) => {
+			e.preventDefault();
+			this.hide();
+		});
 	}
 
 	sell(ore) {
@@ -34,21 +39,29 @@ export default class Inventory {
 	drawMoney() {
 		this.c.beginPath();
 		this.c.strokeStyle = "#000";
+		this.c.fillStyle = "#000";
 		this.c.font = "25px Arial";
-		this.c.fillText(this.money, this.c.canvas.width - 100, 20);
+		this.c.fillText("$" + this.money, this.c.canvas.width - 100, 30);
+	}
+	show() {
+		document.getElementById("inventory").setAttribute("class", "inventory-open");
+		this.isVisible = true;
+	}
+
+	hide() {
+		document.getElementById("inventory").setAttribute("class", "inventory-closed");
+		this.isVisible = false;
 	}
 
 	updateUI() {
-		const menu = document.getElementsByClassName("player-inventory")[0];
 		// TODO: fix so only updates when in shop
-
-		// if (this.isVisible) {
-		// 	Object.keys(this.ores).forEach((key) => {
-		// 		const header = document.getElementsByClassName(`${key}-count`)[0];
-		// 		const value = document.getElementsByClassName(`${key}-value`)[0];
-		// 		value.innerHTML = "$ " + this.ores[key].length * this.oreValues[key];
-		// 		header.innerHTML = "x" + this.ores[key].length + ` ${key}`;
-		// 	});
-		// }
+		if (this.isVisible) {
+			Object.keys(this.ores).forEach((key) => {
+				const header = document.getElementsByClassName(`${key}-count`)[0];
+				const value = document.getElementsByClassName(`${key}-value`)[0];
+				value.innerHTML = "$ " + this.ores[key].length * this.oreValues[key];
+				header.innerHTML = "x" + this.ores[key].length + ` ${key}`;
+			});
+		}
 	}
 }

@@ -3,6 +3,7 @@ import Inventory from "./player_inventory";
 import io from "socket.io-client";
 import Vector from "../basic/Vector";
 import playerSpritesheet from "../../../images/player-spritesheet.png";
+import { invlerp } from "../../collision/util";
 
 const socket = io("http://localhost:5000");
 
@@ -24,7 +25,6 @@ export default class Player extends PlayerMovement {
 			tileFrames,
 			color
 		);
-		console.log(tileFrames);
 		this.name = name;
 		this.c = c;
 		this.pos = pos;
@@ -36,7 +36,6 @@ export default class Player extends PlayerMovement {
 		this.facingDirection = "";
 		this.status = "";
 		this.delta = null;
-		this.test = 0;
 	}
 
 	displayToUser(msg) {
@@ -57,23 +56,31 @@ export default class Player extends PlayerMovement {
 		}, 2500);
 	}
 
-	draw() {
-		this.c.fillStyle = this.color;
-		this.c.strokeStyle = this.color;
-		let offsetX = this.width / 4; // for sprite
-		let player_x = Math.round(this.pos.x - this.camera.pos.x + this.c.canvas.width / 2 - this.camera.width / 2);
-		let player_y = Math.round(this.pos.y - this.camera.pos.y + this.c.canvas.height / 2 - this.camera.height / 2);
-		this.c.beginPath();
-		this.drill.sprite.draw(player_x - offsetX, player_y);
-		this.c.rect(player_x, player_y, this.width, this.height);
-		this.c.stroke();
+	drawScore() {
 		document.getElementById("status").innerText = this.status;
+		document.getElementById("position").innerText = `Player Position: { x: ${Math.trunc(
+			this.pos.x
+		)}, y: ${Math.trunc(this.pos.y)} }`;
 	}
 
-	update(delta) {
+	drawHealth() {
+		let hp = invlerp(this.minHP, this.maxHP, this.health);
+		this.c.beginPath();
+		this.c.strokeStyle = "#000";
+		this.c.fillStyle = "#000";
+
+		this.c.font = "25px Arial";
+		this.c.fillText("Health:", 20, 30);
+		this.c.fillStyle = "#ff0000";
+
+		this.c.fillRect(110, 14, hp * 100, 20);
+		this.c.rect(110, 14, 100, 20);
+		this.c.stroke();
+		this.c.closePath();
+	}
+
+	updateFrames() {
 		let status = "";
-		this.delta = delta;
-		this._move();
 
 		if (this.isMoving) status = "Moving";
 
@@ -90,8 +97,30 @@ export default class Player extends PlayerMovement {
 			this.drill.sprite.frameX = 0;
 			this.drill.sprite.frameY = 0;
 		}
+		return status;
+	}
 
-		this.status = status;
+	draw() {
+		this.c.beginPath();
+
+		this.c.fillStyle = this.color;
+		this.c.strokeStyle = this.color;
+		let offsetX = this.width / 4; // for sprite
+		let player_x = Math.ceil(this.pos.x - this.camera.pos.x + this.c.canvas.width / 2 - this.camera.width / 2);
+		let player_y = Math.ceil(this.pos.y - this.camera.pos.y + this.c.canvas.height / 2 - this.camera.height / 2);
+		this.drill.sprite.draw(player_x - offsetX, player_y);
+		this.c.rect(player_x, player_y, this.width, this.height);
+		this.c.stroke();
+		this.c.closePath();
+		this.drawScore();
+		this.drawHealth();
+	}
+
+	update(delta, shop) {
+		this.delta = delta;
+		this._move(shop);
+
+		this.status = this.updateFrames();
 
 		// TODO: check if player is in shop tile AND is grounded
 		this.inventory.updateUI();

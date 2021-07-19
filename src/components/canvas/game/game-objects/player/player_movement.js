@@ -3,8 +3,31 @@ import Collision from "../../collision/collision";
 import Util from "../../collision/util";
 import Vector from "../basic/Vector";
 
-class Move {
+class Hitbox {
+	constructor(health) {
+		this.health = health;
+		this.maxHP = health;
+		this.minHP = 0;
+	}
+	fallDamage(velocity) {
+		let dmg = velocity * 1.25;
+
+		this.health -= dmg;
+	}
+
+	damageOverTime() {
+		this.health -= 0.005;
+	}
+
+	damage(velocity) {
+		this.health -= 5;
+	}
+	heal() {}
+}
+
+class Move extends Hitbox {
 	constructor(c, inventory, spritesheet, speed, columns, rows, mapW, mapH, tilesize, tileFrames) {
+		super(250);
 		this.speed = speed;
 		this.tilesize = tilesize;
 		this.inventory = inventory;
@@ -28,6 +51,7 @@ class Move {
 		this.moves = {
 			keyW: (vector) => {
 				this.isMoving = true;
+				this.isFlying = true;
 				this.facingDirection = "up";
 				this.pos.y = vector.y;
 			},
@@ -39,7 +63,6 @@ class Move {
 			keyS: (vector) => {
 				this.isMoving = true;
 				this.facingDirection = "down";
-
 				this.pos.y = vector.y;
 			},
 			keyD: (vector) => {
@@ -48,18 +71,44 @@ class Move {
 				this.pos.x = vector.x;
 			},
 		};
+		this.canMove = true;
+		this.isFlying = false;
+		this.isGrounded = false;
 		this.isMoving = false;
 		this.isMining = false;
+		this.isShopping = false;
 		this.keys = {};
 		this.keysElapsed = {};
-		this.jumpHeight = this.speed.y * 2;
+		// this.jumpHeight = this.speed.y * 2;
+		this.gravity = {
+			initial: 1,
+			velocity: 1,
+			acc: 0.5,
+			drag: 0.05,
+		};
+		console.log(this.gravity);
 	}
 
-	_move() {
+	isPlayerGrounded() {
+		let y = Util.lerp(this.pos.y, this.pos.y + this.gravity.velocity, this.delta);
+		let vector = new Vector(this.pos.x, y);
+		if (
+			this.collision.collide_down([
+				new Vector(vector.x, vector.y + this.height),
+				new Vector(vector.x + this.width, vector.y + this.height),
+			])
+		) {
+			return true;
+		}
+		return false;
+	}
+
+	_move(shop) {
 		let new_x, new_y;
+
 		// ? ----- Movement Section ----- ? //
 		if (this.keys["KeyW"]) {
-			new_y = Util.lerp(this.pos.y, this.pos.y - this.speed.y, this.delta);
+			new_y = Util.lerp(this.pos.y, this.pos.y - this.speed.y * 1.5, this.delta);
 			if (new_y <= 0) return this.displayToUser(`cant move past world y limit: 0`);
 
 			if (
@@ -72,7 +121,13 @@ class Move {
 		if (this.keys["KeyA"]) {
 			new_x = Util.lerp(this.pos.x, this.pos.x - this.speed.x, this.delta);
 			if (new_x <= 0) return this.displayToUser("cant move past world x limit: 0");
-
+			if (shop.isPlayerWithinShop(new Vector(new_x, this.pos.y))) {
+				shop.enterShop("right");
+				this.isShopping = true;
+				return;
+			} else {
+				shop.exitShop(new Vector(new_x, this.pos.y), this.width);
+			}
 			if (
 				!this.collision.collide_left([
 					new Vector(new_x, this.pos.y),
@@ -89,15 +144,20 @@ class Move {
 			new_x = Util.lerp(this.pos.x, this.pos.x + this.speed.x, this.delta);
 			if (new_x + this.width > this.worldW)
 				return this.displayToUser(`cant move past world x limit: ${this.worldW}`);
+
+			if (shop.isPlayerWithinShop(new Vector(new_x + this.width, this.pos.y))) {
+				shop.enterShop("left");
+				this.isShopping = true;
+				return;
+			} else {
+				shop.exitShop(new Vector(new_x, this.pos.y), this.width);
+			}
+
 			if (
-				!this.collision.collide_right(
-					[
-						new Vector(new_x + this.width, this.pos.y),
-						new Vector(new_x + this.width, this.pos.y + this.height),
-					],
-					this.speed,
-					this.delta
-				)
+				!this.collision.collide_right([
+					new Vector(new_x + this.width, this.pos.y),
+					new Vector(new_x + this.width, this.pos.y + this.height),
+				])
 			) {
 				this.drill.sprite.frameX = 1;
 				this.drill.sprite.frameY = 0;
@@ -110,20 +170,17 @@ class Move {
 			if (new_y + this.height > this.worldH)
 				return this.displayToUser(`cant move past world y limit: ${this.worldH}`);
 			if (
-				!this.collision.collide_down(
-					[
-						new Vector(this.pos.x, new_y + this.height),
-						new Vector(this.pos.x + this.width, new_y + this.height),
-					],
-					this.speed,
-					this.delta
-				)
+				!this.collision.collide_down([
+					new Vector(this.pos.x, new_y + this.height),
+					new Vector(this.pos.x + this.width, new_y + this.height),
+				])
 			) {
 				this.drill.sprite.frameX = 3;
 				this.drill.sprite.frameY = 0;
 				this.moves["keyS"](new Vector(this.pos.x, new_y));
 			}
 		}
+
 		// ? ----- Mining Section ----- ? //
 		let canMine = true;
 		if (
@@ -165,6 +222,23 @@ class Move {
 				this.drill.mine(t, this.delta, this.inventory.add.bind(this.inventory));
 			}
 		}
+
+		// ? Gravity Section
+		if (!this.isPlayerGrounded() && !this.isFlying) {
+			new_y = Util.lerp(this.pos.y, this.pos.y + this.gravity.velocity, this.delta);
+			this.pos.y = new_y;
+			console.log(this.gravity.velocity);
+			this.isGrounded = false;
+			this.gravity.velocity += this.gravity.acc * this.gravity.drag;
+		} else {
+			this.isGrounded = true;
+			if (this.gravity.velocity >= 20) {
+				this.fallDamage(Math.trunc(this.gravity.velocity));
+			} else {
+				this.damageOverTime();
+			}
+			this.gravity.velocity = this.gravity.initial;
+		}
 	}
 }
 
@@ -196,14 +270,16 @@ export default class PlayerMovement extends Move {
 	attachKeyListener() {
 		document.addEventListener("keydown", (e) => {
 			this.keys[e.code] = true;
-			if (!this.keysElapsed[e.code]) this.keysElapsed[e.code] = performance.now();
-			else document.getElementById("timevalue").innerText = 0;
-			document.getElementById("btnvalue").innerText = e.code;
+			// if (!this.keysElapsed[e.code]) this.keysElapsed[e.code] = performance.now();
+			// else document.getElementById("timevalue").innerText = 0;
+			// document.getElementById("btnvalue").innerText = e.code;
 		});
 		document.addEventListener("keyup", (e) => {
 			this.keys[e.code] = false;
 			let timeElapsed = performance.now() - this.keysElapsed[e.code];
 			delete this.keysElapsed[e.code];
+
+			if (!this.keys["keyW"]) this.isFlying = false;
 
 			if (!this.keys["keyW"] || !this.keys["keyA"] || !this.keys["keyS"] || !this.keys["keyD"])
 				this.isMoving = false;
@@ -215,7 +291,7 @@ export default class PlayerMovement extends Move {
 			)
 				this.isMining = false;
 
-			document.getElementById("timevalue").innerText = `${(timeElapsed / 1000).toFixed(2)}`;
+			// document.getElementById("timevalue").innerText = `${(timeElapsed / 1000).toFixed(2)}`;
 		});
 	}
 }

@@ -41,8 +41,8 @@ export default class GameManager {
 		this.frames = frames;
 		const playerWidth = (tilesize / 8) * 4;
 		const playerHeight = (tilesize / 8) * 6;
-		const playerPosition = new Vector(mapW / 2, tilesize * 3 - playerHeight);
-		const cameraPosition = new Vector(mapW / 2, 0);
+		const playerPosition = new Vector(mapW / 4, tilesize * 3 - playerHeight);
+		const cameraPosition = new Vector(playerPosition.x, 0);
 		const camera = new Camera(
 			this.c,
 			cameraPosition,
@@ -60,7 +60,7 @@ export default class GameManager {
 			camera,
 			playerPosition,
 			tilesize,
-			new Vector(8, 8),
+			new Vector(10, 10),
 			playerWidth,
 			playerHeight,
 			mapW,

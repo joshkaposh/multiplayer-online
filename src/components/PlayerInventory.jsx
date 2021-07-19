@@ -1,7 +1,6 @@
 import React,{useState,useEffect} from 'react';
 
 function Ore({ type }) {
-    console.log(type);
     return (
         <li className='sell-list-item'>
             <div className='sell-list-item-info'>
@@ -11,6 +10,40 @@ function Ore({ type }) {
             
             <button className={type + '-sell sell-btn'} value={type} type='button' >Sell</button>
         </li>)
+}
+
+function InventoryNav() {
+  return (
+    <div className='inventory-nav'>
+      <ul className='inventory-nav-list'>
+        <button className="inventory-nav-item"></button>
+        <button className="inventory-nav-item"></button>
+        <button className="inventory-nav-item"></button>
+        <button id='inventory-exit'>X</button>
+      </ul>
+    </div>
+  )
+}
+
+function SellSection() {
+  return (
+    <div className='sell-section'>
+                <h3 className='sell-header'>Ores</h3>
+                <ul className='sell-list'>
+                    <Ore type={'copper'} />
+                    {/* <Ore type={'silver'} />
+                    <Ore type={'gold'} /> */}
+                </ul>
+            </div>
+  )
+}
+
+function BuySection({header}) {
+  return (
+    <div className='buy-section'>
+      <h3>Buy</h3>
+    </div>
+  )
 }
 
 function useKeyPress(targetKey) {
@@ -43,39 +76,16 @@ function useKeyPress(targetKey) {
 
 export default function Inventory(props) {
 
-    let [isHidden, setVisibility] = useState(false)
+    // let [isHidden, setVisibility] = useState(false)
 
     // TODO: fix so player only sees menu when in shop
-
-
     return (
-      <div className='player-inventory inventory-closed'>
-            <div className='inventory-nav'>
-                <button id='inventory-exit' onClick={(e) => {
-                    // e.preventDefault();
-
-                    document.getElementsByClassName('player-inventory')[0].setAttribute('data','inventory-closed')
-                    setVisibility(true)
-                }}>X</button>
-                <ul className='inventory-nav-list'>
-                    <button className="inventory-nav-item"></button>
-                    <button className="inventory-nav-item"></button>
-                    <button className="inventory-nav-item"></button>
-                </ul>
-            </div>
-            <div className='sell-section'>
-
-                <h3 className='sell-header'>Ores</h3>
-                <ul className='sell-list'>
-                    <Ore type={'copper'} />
-                    <Ore type={'silver'} />
-                    <Ore type={'gold'} />
-
-                </ul>
-
-
-            </div>
-            <div className='buy-section'></div>
+      <div className="inventory-closed" id="inventory">
+        <InventoryNav />
+        <div className='inventory-sections'>
+          <BuySection />
+          <SellSection />
         </div>
+      </div>
     )
 }
