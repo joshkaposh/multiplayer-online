@@ -1,11 +1,18 @@
 export default class Shop {
-	constructor(c, pos, width, height, color) {
+	constructor(c, pos, width, height, tilesize, color) {
 		this.c = c;
 		this.pos = pos;
 		this.width = width;
 		this.height = height;
+		this.boundary = {
+			x: pos.x - tilesize,
+			y: pos.y + height,
+			width: width + tilesize * 2,
+			height: tilesize / 2,
+		};
 		this.color = color;
-		this.enteredDirection = null;
+		this.tilesize = tilesize;
+		this.isVisible = false;
 	}
 
 	isPlayerWithinShop(vector) {
@@ -20,26 +27,31 @@ export default class Shop {
 		return false;
 	}
 
-	enterShop(enteredDir) {
-		this.enteredDirection = enteredDir;
+	open() {
 		const inventory = document.getElementById("inventory");
 		inventory.setAttribute("class", "inventory-open");
 	}
 
-	exitShop(vector, width) {
-		let exitDist = 10;
-		switch (this.enteredDirection) {
-			case "left":
-				vector.x = this.pos.x - width - exitDist;
-				break;
-			case "right":
-				vector.x = this.pos.x + this.width + exitDist;
-				break;
-			default:
-				break;
-		}
+	closed() {
 		const inventory = document.getElementById("inventory");
 		inventory.setAttribute("class", "inventory-closed");
+	}
+
+	isTileWithinBoundary(tile) {
+		let { xMin, yMin, xMax, yMax } = this.getBoundary();
+		if (tile.x >= xMin && tile.x <= xMax && tile.y >= yMin && tile.y <= yMax) {
+			return true;
+		}
+		return false;
+	}
+
+	getBoundary() {
+		return {
+			xMin: this.boundary.x,
+			yMin: this.boundary.y,
+			xMax: this.boundary.x + this.boundary.width,
+			yMax: this.boundary.y + this.boundary.height,
+		};
 	}
 
 	draw(camera) {
@@ -49,6 +61,8 @@ export default class Shop {
 		this.c.fillStyle = this.color;
 		this.c.strokeStyle = this.color;
 		this.c.fillRect(shop_x, shop_y, this.width, this.height);
+
+		// this.c.fillRect(boundary_x, boundary_y, boundaryWidth, boundaryHeight);
 		this.c.closePath();
 	}
 	update(camera) {

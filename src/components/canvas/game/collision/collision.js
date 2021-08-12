@@ -55,7 +55,7 @@ export default class PlayerCollision {
 				true
 			);
 
-			if (corners[i].y > tile.y && corners[i].x > tile.x && corners[i].x < tile.x + this.tilesize) {
+			if (corners[i].y >= tile.y && corners[i].x >= tile.x && corners[i].x <= tile.x + this.tilesize) {
 				if (tile.value !== 0) {
 					bool = true;
 				}
@@ -76,9 +76,9 @@ export default class PlayerCollision {
 			);
 
 			if (
-				corners[i].x < tile.x + this.tilesize &&
-				corners[i].y > tile.y &&
-				corners[i].y < tile.y + this.tilesize
+				corners[i].x <= tile.x + this.tilesize &&
+				corners[i].y >= tile.y &&
+				corners[i].y <= tile.y + this.tilesize
 			) {
 				if (tile.value !== 0) {
 					bool = true;

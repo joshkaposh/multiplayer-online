@@ -1,4 +1,4 @@
-import Drill from "./player_drill";
+import PlayerSprite from "./player_sprite";
 import Util from "../../collision/util";
 
 class TileConverter {
@@ -21,20 +21,20 @@ class TileConverter {
 		let frame;
 		switch (top.type) {
 			case "grass":
-				frame = this.tileFrames.grass.both_under;
+				frame = this.tileFrames.grass.corners.both_under;
 				top.frameX = frame.col;
 				top.frameY = frame.row;
 				top.type = "grass_both_under";
 
 				break;
 			case "grass_corner_right":
-				frame = this.tileFrames.grass.both_right;
+				frame = this.tileFrames.grass.corners.both_right;
 				top.frameX = frame.col;
 				top.frameY = frame.row;
 				top.type = "grass_both_right";
 				break;
 			case "grass_corner_left":
-				frame = this.tileFrames.grass.both_left;
+				frame = this.tileFrames.grass.corners.both_left;
 				top.frameX = frame.col;
 				top.frameY = frame.row;
 				top.type = "grass_both_left";
@@ -79,7 +79,7 @@ class TileConverter {
 
 		switch (left.type) {
 			case "grass":
-				frame = this.tileFrames.grass.top_right;
+				frame = this.tileFrames.grass.corners.top_right;
 				left.frameX = frame.col;
 				left.frameY = frame.row;
 				left.value = 1;
@@ -103,7 +103,7 @@ class TileConverter {
 
 		switch (right.type) {
 			case "grass_both_right":
-				frame = this.tileFrames.grass.all;
+				frame = this.tileFrames.grass.corners.all;
 				right.frameX = frame.col;
 				right.frameY = frame.row;
 				right.frameY = frame.row;
@@ -111,7 +111,7 @@ class TileConverter {
 				right.type = "grass_all";
 				break;
 			case "grass_both_under":
-				frame = this.tileFrames.grass.grass_both_left;
+				frame = this.tileFrames.grass.corners.grass_both_left;
 				right.frameX = frame.col;
 				right.frameY = frame.row;
 				right.frameY = frame.row;
@@ -120,7 +120,7 @@ class TileConverter {
 
 				break;
 			case "grass":
-				frame = this.tileFrames.grass.top_left;
+				frame = this.tileFrames.grass.corners.top_left;
 				right.frameX = frame.col;
 				right.frameY = frame.row;
 				right.value = 1;
@@ -233,8 +233,9 @@ export default class Mine extends TileConverter {
 		this.mapW = mapW;
 		this.mapH = mapH;
 		this.count = 0;
+		this.totalCount = 0;
 		this.drill_speed = 5;
-		this.sprite = new Drill(c, spritesheet, width, height, 2);
+		this.sprite = new PlayerSprite(c, spritesheet, width, height, 2, 2);
 		this.mined = null;
 	}
 
@@ -263,7 +264,7 @@ export default class Mine extends TileConverter {
 		if (integrity < percents[25]) return 3;
 		if (integrity < percents[50]) return 2;
 		if (integrity < percents[75]) return 1;
-		if (integrity < percents[100]) return 0;
+		if (integrity > percents[75]) return 0;
 	}
 
 	changeTileToBreaking(tile) {
@@ -279,13 +280,13 @@ export default class Mine extends TileConverter {
 			tile.type === "dirt_corner_bottom_right"
 		)
 			return this.tileFrames.dirt.breaking[0].row;
-		if (tile.type === "copper_ore") return this.tileFrames.ores.copper.breaking[0].row;
+		if (tile.type === "copper") return this.tileFrames.ores.copper.breaking[0].row;
+		if (tile.type === "iron") return this.tileFrames.ores.iron.breaking[0].row;
 	}
 
 	async mine(tile, delta, cb) {
 		let new_integrity = Util.lerp(tile.integrity, tile.integrity - this.drill_speed, delta);
 
-		// console.log(this.tileFrames);
 		if (
 			tile.value === this.tileFrames.walkables[0] ||
 			tile.value === this.tileFrames.walkables[1] ||
@@ -293,12 +294,12 @@ export default class Mine extends TileConverter {
 			tile.type === "mined"
 		)
 			return;
-
 		// if tile is walkable, return early
+
 		tile.frameY = this.changeTileToBreaking(tile);
 		tile.frameX = this.checkIntegrityLevel(tile);
-
 		// update sprite
+
 		if (new_integrity <= 0) {
 			// mined
 			tile.frameY = 0;
@@ -306,11 +307,22 @@ export default class Mine extends TileConverter {
 				tile.frameX = 1;
 			} else tile.frameX = 2;
 
-			if (tile.type === "copper_ore") {
-				console.log("mined copper ore");
-				await cb("copper");
-				// this.inventory.add("copper");
+			switch (tile.type) {
+				case "copper":
+					// console.log("mined copper ore");
+					await cb("copper");
+					break;
+				case "iron":
+					// console.log("mined iron ore");
+					await cb("iron");
+					break;
+				default:
+					break;
 			}
+
+			const tileTypes = Object.keys(this.tileFrames);
+			console.log(tileTypes);
+
 			this.mined = tile.type;
 
 			tile.type = "mined";

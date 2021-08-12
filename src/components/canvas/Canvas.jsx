@@ -2,8 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import useUser from '../../context/user';
 import Game from './game/gameManager';
-import MapEditor from '../map-editor-ui/MapEditor';
 import Inventory from '../PlayerInventory';
+import DeathMenu from '../DeathMenu';
 const socket = io('http://localhost:5000')
 const game = []
 
@@ -25,15 +25,16 @@ export default function Canvas({gamedata}) {
         const canvas = document.getElementById('canvas');
         const c = canvas.getContext('2d')
 
-        let lastFrameTime, animationId, fps;
+        let totalFrameTime,lastFrameTime, animationId, fps;
 
-        console.log(gamedata)
+        console.log('FRAMES:::',gamedata.frames)
 
         const animate = () => {
             c.clearRect(0, 0, c.canvas.width, c.canvas.height);
             
             if (!lastFrameTime) {
                 lastFrameTime = performance.now();
+                totalFrameTime = 0;
                 fps = 0;
                 requestAnimationFrame(animate)
                 return;
@@ -41,8 +42,8 @@ export default function Canvas({gamedata}) {
 
             let delta = (performance.now() - lastFrameTime)/1000;
             lastFrameTime = performance.now();
-
-            game.forEach(frame => frame.update(delta))
+            totalFrameTime += delta;
+            game.forEach(frame => frame.update(delta,totalFrameTime))
             
             animationId = window.requestAnimationFrame(animate);
         }
@@ -62,16 +63,18 @@ export default function Canvas({gamedata}) {
             <PlayerInfo className='player-info' />
             <div className='player-stats'>
                 <h2>Player Status: <span id="status"></span></h2>
-                <h2><span id="position"></span></h2>
-            </div>
+                <h2>Position: <span id="position"> </span></h2>
+                <h2>Velocity: <span id="velocity"> </span></h2>
 
-            {/* <MapEditor canvasRef={canvasRef} /> */}
-            
+            </div>
             <div className='container'>
                 <canvas id="canvas" ref={canvasRef}></canvas>
                 <Inventory />
+                <DeathMenu ores={{
+                    dirt: gamedata.frames.dirt,
+                    ...gamedata.frames.ores,
+        }} />
            </div>
-          
         </div>
     )
 }

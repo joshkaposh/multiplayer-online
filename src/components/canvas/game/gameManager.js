@@ -4,34 +4,59 @@ import World from "./map/world";
 import Vector from "./game-objects/basic/Vector";
 import { frames } from "./frames/frames.json";
 
-export class TurnManager {
-	constructor(socket) {
-		this.socket = socket;
-		this.turn = 0;
-		this.turnStatus = "";
+class PlayerSpawnSystem {
+	constructor(stats) {
+		this.player_stats = stats;
+	}
+	setInitialStats(stats) {}
+
+	initialStats() {
+		const height = this.tilesize - this.tilesize / 5;
+		return {
+			width: this.tilesize / 3,
+			height,
+			position: new Vector(this.mapW / 4, this.tilesize * 3 - height),
+		};
 	}
 
-	emitPlayerMoveToServer(dir, playerName) {
-		this.socket.emit("direction", { username: playerName, direction: dir });
-	}
-
-	startTurn(player) {
-		player.status = "startOfTurn";
-		this.turnStatus = "startOfTurn";
-	}
-
-	endTurn(playerName, dir) {
-		this.turnStatus = "endOfTurn";
-		this.turn++;
-		// this.emitPlayerMoveToServer(playerName, dir);
-	}
-	reset() {
-		this.turn = 0;
+	spawnPlayer({
+		playerName,
+		c,
+		camera,
+		playerPosition,
+		tilesize,
+		speed,
+		width,
+		height,
+		mapW,
+		mapH,
+		columns,
+		rows,
+		frames,
+		color,
+	}) {
+		return new Player(
+			playerName,
+			c,
+			camera,
+			playerPosition,
+			tilesize,
+			speed,
+			width,
+			height,
+			mapW,
+			mapH,
+			columns,
+			rows,
+			frames,
+			color
+		);
 	}
 }
 
-export default class GameManager {
+export default class GameManager extends PlayerSpawnSystem {
 	constructor(socket, c, playerName, { data: map, rows, columns, tilesize, mapW, mapH, frames }) {
+		super();
 		this.socket = socket;
 		this.c = c;
 		this.enemies = [];
@@ -39,8 +64,8 @@ export default class GameManager {
 		this.columns = columns;
 		this.rows = rows;
 		this.frames = frames;
-		const playerWidth = (tilesize / 8) * 4;
-		const playerHeight = (tilesize / 8) * 6;
+		const playerWidth = tilesize / 3;
+		const playerHeight = tilesize - tilesize / 5;
 		const playerPosition = new Vector(mapW / 4, tilesize * 3 - playerHeight);
 		const cameraPosition = new Vector(playerPosition.x, 0);
 		const camera = new Camera(
@@ -54,23 +79,26 @@ export default class GameManager {
 			mapW,
 			mapH
 		);
-		const player = new Player(
+		const player = this.spawnPlayer({
 			playerName,
-			this.c,
+			c,
 			camera,
 			playerPosition,
 			tilesize,
-			new Vector(10, 10),
-			playerWidth,
-			playerHeight,
+			speed: new Vector(10, 10),
+			width: playerWidth,
+			height: playerHeight,
 			mapW,
 			mapH,
 			columns,
 			rows,
 			frames,
-			"grey"
-		);
+			color: "grey",
+		});
+		console.log(player);
+
 		this.world = new World(this.c, camera, { data: map, rows, columns, tilesize, mapW, mapH }, player);
+		console.log(this.world);
 		this.turn = 0;
 	}
 
@@ -82,14 +110,15 @@ export default class GameManager {
 
 		console.log(this.frames);
 		frames = this.frames;
+
 		// canvas.style.left = window.innerWidth / 2 - this.c.canvas.width / 2;
 		// canvas.style.top = window.innerHeight / 2 - this.c.canvas.height / 2;
 
 		this.world.init();
 	}
 
-	update(delta) {
+	update(delta, totalDelta) {
 		this.c.imageSmoothingEnabled = false;
-		this.world.render(delta, [this.player]);
+		this.world.update(delta, totalDelta);
 	}
 }

@@ -1,3 +1,8 @@
+p {
+  padding: 0;
+  margin: 0;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
@@ -31,7 +36,6 @@ nav {
   justify-content: space-between;
   align-items: center;
   padding: 0 3rem;
-  background: pink;
 }
 
 /** Canvas */
@@ -55,6 +59,48 @@ nav {
   height: 400px;
   background-color: rgba(0, 0, 0, 0.7);
   z-index: 100;
+}
+
+#death-menu {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 600px;
+  height: 400px;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+}
+#death-menu .death-menu-stats {
+  margin: 0;
+  margin-top: 2rem;
+  padding: 0;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid lightskyblue;
+}
+#death-menu .death-menu-survival-stats {
+  margin-top: 0.5rem;
+}
+#death-menu .death-menu-buttons {
+  border: 1px solid lightcoral;
+  margin-top: 5rem;
+}
+#death-menu .death-menu-buttons .death-btn {
+  margin-right: 1rem;
+  margin-left: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+}
+
+.hide {
+  display: none;
+}
+
+.show {
+  display: flex;
+  flex-direction: column;
 }
 
 .inventory-closed {
@@ -90,28 +136,89 @@ nav {
 .inventory-nav .inventory-nav-list .inventory-nav-item:first-child {
   margin: 0 2rem 0 auto;
 }
-.inventory-nav .inventory-nav-list #inventory-exit {
+
+#inventory-exit {
   margin-left: auto;
   background-color: #850404;
   color: #f00606;
   border: 1px solid #f00606;
   border-radius: 5px;
 }
-.inventory-nav .inventory-nav-list #inventory-exit:hover {
+
+#inventory-exit:hover {
   background-color: #a80505;
   color: #ff5f5f;
   border: 1px solid #ff5f5f;
 }
 
+.buy-nav-list {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+}
+.buy-nav-list .buy-nav-item {
+  margin-right: 1rem;
+  height: 32px;
+  width: 32px;
+}
+.buy-nav-list .buy-nav-item button {
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .buy-section {
-  color: white;
-  min-width: 50%;
-  padding-top: 0.5rem;
+  color: #ebebeb;
+  width: 300px;
+  display: flex;
+  text-align: center;
+  font-size: 15px;
+}
+.buy-section h4 {
+  font-size: 16px;
+}
+.buy-section .buy-list {
+  display: flex;
+  flex-flow: row nowrap;
+}
+.buy-section .buy-list .buy-list-item {
+  margin-right: 1rem;
+}
+.buy-section .buy-list .buy-list-item .buy-btn {
+  border: 2px solid #a10000;
+  background-color: #b60000;
+  border-radius: 7px;
+  color: #ebebeb;
+}
+.buy-section .buy-list .buy-list-item .buy-btn:hover {
+  border: 2px solid #c80000;
+  background-color: 2px solid #c80000;
+}
+.buy-section .buy-list .buy-list-item-info {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+}
+.buy-section .buy-list .buy-list-item-info > * {
+  margin-top: 0.2rem;
+}
+
+.buy-list-inactive {
+  display: none;
+}
+
+.buy-list-active {
+  display: flex;
+  flex-direction: column;
 }
 
 .sell-section {
-  color: white;
-  min-width: 50%;
+  color: #ebebeb;
+  width: 300px;
   border-right: 2px solid rgba(0, 0, 0, 0.8);
   padding-top: 0.5rem;
 }
@@ -140,14 +247,20 @@ nav {
   font-size: 15px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.8);
 }
-.sell-section .sell-list .sell-btn {
+.sell-section .sell-list .sell-list-item .sell-btn {
   margin-top: 0.5rem;
   padding: 0.25rem 0.5rem;
   border-radius: 5px;
-  max-height: 2rem;
   color: #ebebeb;
   background-color: #4c9e4c;
   border: 2px solid #0e8b0e;
+}
+.sell-section .sell-list .sell-list-item .sell-all-btn {
+  width: 5rem;
+  margin-right: 0.5rem;
+}
+.sell-section .sell-list .can-sell {
+  transition: ease-in-out border 50ms;
 }
 .sell-section .sell-list .sell-btn:hover {
   background-color: #51b651;
@@ -169,8 +282,9 @@ nav {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: row;
-  /* max-height: 50px; */
+  flex-direction: column;
+  font-size: 14px;
+  min-height: 150px;
 }
 
 /** Player Info **/
@@ -178,6 +292,7 @@ nav {
   display: inline;
   font-weight: 400;
   letter-spacing: 0.25mm;
+  height: 100px;
 }
 
 .player-info {

@@ -9,11 +9,30 @@ $sellBtnBorder: 2px solid rgb(14, 139, 14);
 $sellBtnBgHovered: rgb(81, 182, 81);
 $sellBtnBorderHovered: 2px solid rgb(18, 163, 18);
 
-$sellColor: white;
-$buyColor: white;
+$buyBtnColor: rgb(235, 235, 235);
+$buyBtnBorder: 2px solid rgb(161, 0, 0);
+$buyBtnBg: rgb(182, 0, 0);
 
+$buyBtnBgHovered: rgb(161, 0, 0);
+$buyBtnBorderHovered: 2px solid rgb(200, 0, 0);
+
+$buyBtnRadius: 7px;
+
+$sellColor: rgb(235, 235, 235);
+$buyColor: rgb(235, 235, 235);
+
+$navBorder: 2px solid rgba(255, 255, 255, 0.5);
 $inventoryBorder: 2px solid rgba(0, 0, 0, 0.8);
 $sellItemBorder: 1px solid rgba(0, 0, 0, 0.8);
+
+$lightness: 1 * 70%;
+
+$menuOverlayBg: hsla(360, 120, 0, $lightness);
+
+p {
+	padding: 0;
+	margin: 0;
+}
 
 body {
 	margin: 0;
@@ -49,7 +68,6 @@ nav {
 	justify-content: space-between;
 	align-items: center;
 	padding: 0 3rem;
-	background: pink;
 }
 
 /** Canvas */
@@ -73,9 +91,52 @@ nav {
 	transform: $center;
 	width: $gameWidth;
 	height: $gameHeight;
-	background-color: hsla(360, 120, 0, 0.7);
+	background-color: $menuOverlayBg;
 	z-index: 100;
-	// color: white;
+}
+
+#death-menu {
+	position: absolute;
+	left: 50%;
+	transform: $center;
+	width: 600px;
+	height: 400px;
+	background-color: $menuOverlayBg;
+	z-index: 100;
+
+	.death-menu-stats {
+		margin: 0;
+		margin-top: 2rem;
+		padding: 0;
+		padding-top: 1rem;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		border: 1px solid lightskyblue;
+	}
+	.death-menu-survival-stats {
+		margin-top: 0.5rem;
+	}
+
+	.death-menu-buttons {
+		border: 1px solid lightcoral;
+		margin-top: 5rem;
+		.death-btn {
+			margin-right: 1rem;
+			margin-left: 1rem;
+			padding: 0.5rem 1rem;
+			border-radius: 10px;
+		}
+	}
+}
+
+.hide {
+	display: none;
+}
+
+.show {
+	display: flex;
+	flex-direction: column;
 }
 
 .inventory-closed {
@@ -111,30 +172,98 @@ nav {
 		.inventory-nav-item:first-child {
 			margin: 0 2rem 0 auto;
 		}
-		#inventory-exit {
-			margin-left: auto;
-			background-color: rgb(133, 4, 4);
-			color: rgb(240, 6, 6);
-			border: 1px solid rgb(240, 6, 6);
-			border-radius: 5px;
-		}
-		#inventory-exit:hover {
-			background-color: rgb(168, 5, 5);
-			color: rgb(255, 95, 95);
-			border: 1px solid rgb(255, 95, 95);
+	}
+}
+
+#inventory-exit {
+	margin-left: auto;
+	background-color: rgb(133, 4, 4);
+	color: rgb(240, 6, 6);
+	border: 1px solid rgb(240, 6, 6);
+	border-radius: 5px;
+}
+#inventory-exit:hover {
+	background-color: rgb(168, 5, 5);
+	color: rgb(255, 95, 95);
+	border: 1px solid rgb(255, 95, 95);
+}
+
+.buy-nav-list {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	width: 100%;
+	padding: 0;
+	padding-bottom: 0.5rem;
+	border-bottom: $navBorder;
+
+	.buy-nav-item {
+		margin-right: 1rem;
+		height: 32px;
+		width: 32px;
+
+		button {
+			padding: 0;
+			width: 100%;
+			height: 100%;
 		}
 	}
 }
 
 .buy-section {
 	color: $buyColor;
-	min-width: 50%;
-	padding-top: 0.5rem;
+	width: 300px;
+	display: flex;
+	text-align: center;
+	font-size: 15px;
+
+	h4 {
+		font-size: 16px;
+	}
+
+	.buy-list {
+		display: flex;
+		flex-flow: row nowrap;
+
+		.buy-list-item {
+			margin-right: 1rem;
+
+			.buy-btn {
+				border: $buyBtnBorder;
+				background-color: $buyBtnBg;
+				border-radius: $buyBtnRadius;
+				color: $buyBtnColor;
+			}
+
+			.buy-btn:hover {
+				border: $buyBtnBorderHovered;
+				background-color: $buyBtnBorderHovered;
+			}
+		}
+
+		.buy-list-item-info {
+			display: flex;
+			flex-direction: column;
+			padding: 0.5rem;
+			> * {
+				margin-top: 0.2rem;
+			}
+		}
+	}
+}
+
+.buy-list-inactive {
+	display: none;
+}
+
+.buy-list-active {
+	display: flex;
+	flex-direction: column;
 }
 
 .sell-section {
 	color: $sellColor;
-	min-width: 50%;
+	width: 300px;
 	border-right: $inventoryBorder;
 	padding-top: 0.5rem;
 
@@ -163,16 +292,26 @@ nav {
 			align-items: center;
 			font-size: 15px;
 			border-bottom: $sellItemBorder;
+
+			.sell-btn {
+				margin-top: 0.5rem;
+				padding: 0.25rem 0.5rem;
+				border-radius: 5px;
+				color: $sellBtnColor;
+				background-color: $sellBtnBg;
+				border: $sellBtnBorder;
+			}
+
+			.sell-all-btn {
+				width: 5rem;
+				margin-right: 0.5rem;
+			}
 		}
-		.sell-btn {
-			margin-top: 0.5rem;
-			padding: 0.25rem 0.5rem;
-			border-radius: 5px;
-			max-height: 2rem;
-			color: $sellBtnColor;
-			background-color: $sellBtnBg;
-			border: $sellBtnBorder;
+
+		.can-sell {
+			transition: ease-in-out border 50ms;
 		}
+
 		.sell-btn:hover {
 			background-color: $sellBtnBgHovered;
 			border: $sellBtnBorderHovered;
@@ -197,9 +336,9 @@ nav {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	flex-direction: row;
-
-	/* max-height: 50px; */
+	flex-direction: column;
+	font-size: 14px;
+	min-height: 150px;
 }
 
 /** Player Info **/
@@ -208,6 +347,7 @@ nav {
 	display: inline;
 	font-weight: 400;
 	letter-spacing: 0.25mm;
+	height: 100px;
 }
 
 .player-info {
