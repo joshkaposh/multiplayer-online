@@ -6,12 +6,14 @@
         },
         "grass": {
             "default": { "col": 0, "row": 1 },
+            "corners": {
             "top_right": { "col": 1, "row": 1 },
             "top_left": { "col": 2, "row": 1 },
             "both_right": { "col": 3, "row": 1 },
             "both_left": { "col": 4, "row": 1 },
             "both_under": { "col": 5, "row": 1},
-            "all": {"col": 6, "row": 1},
+            "all": {"col": 6, "row": 1}
+        },
             "breaking": {
                 "default": {
                     "0": { "col": 0, "row": 7},
@@ -99,6 +101,7 @@
         "ores": {
             "copper": {
                 "label": "copper_ore",
+                "integrity": {"dirt":150},
                 "default": {
                     "col": 0,
                     "row": 3
@@ -112,6 +115,11 @@
             },
             "iron": {
                 "label": "iron_ore",
+                "integrity": {
+                    "dirt":250,
+                    "hardened_dirt": 300
+                },
+
                 "default": {
                     "col": 1,
                     "row": 3

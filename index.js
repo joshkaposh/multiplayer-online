@@ -2,7 +2,7 @@ const initServer = require("./startup");
 const { server, io } = initServer();
 const connectToDatabase = require("./db/connect");
 const models = require("./db/schema");
-const gameMap = require("./game/map");
+const gameMap = require("./game/map/map");
 const getUniqueID = () => {
 	const s4 = () =>
 		Math.floor((1 + Math.random()) * 0x10000)
