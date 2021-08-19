@@ -1,6 +1,5 @@
 const { frames } = require("../spritesheet.json");
-const { generateTiles, generateOres } = require("./generate");
-
+const { generateLayers, addOresToTiles } = require("./generate_new");
 function applyIntegrityPercents(map, columns, rows) {
 	for (let y = 0; y < rows; y++) {
 		for (let x = 0; x < columns; x++) {
@@ -8,12 +7,16 @@ function applyIntegrityPercents(map, columns, rows) {
 			// assign tile integrity percents
 			const tile = map[y * columns + x];
 
-			if (tile.integrity !== 0)
+			if (tile && tile.integrity !== 0)
 				tile.integPercents = {
 					0: 0,
+					12.5: tile.integrity / 8,
 					25: tile.integrity / 4,
+					37.5: tile.integrity / 4 + tile.integrity / 8,
 					50: tile.integrity / 2,
-					75: tile.integrity / 4 + tile.integrity / 2,
+					62.5: tile.integrity / 2 + tile.integrity / 8,
+					75: tile.integrity / 2 + tile.integrity / 4,
+					87.5: tile.integrity / 2 + tile.integrity / 4 + tile.integrity / 8,
 					100: tile.integrity,
 				};
 		}
@@ -32,10 +35,9 @@ function initializeMap() {
 	let width = columns * tilesize;
 	let height = rows * tilesize;
 
-	let map = generateTiles(columns, rows, tilesize, width, height);
-	generateOres(map, columns, rows, width, height, tilesize);
-
-	applyIntegrityPercents(map, columns, rows);
+	let map = generateLayers(columns, rows, tilesize);
+	addOresToTiles(map[1], columns, rows, width, height, tilesize);
+	applyIntegrityPercents(map[1], columns, rows);
 
 	return {
 		data: map,
