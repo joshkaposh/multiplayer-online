@@ -41,16 +41,21 @@ function InventoryNav() {
   )
 }
 
-function SellSection() {
+function SellSection({ ores }) {
+  // console.log(ores);
+  
   return (
     <div className='sell-section'>
-                <h3 className='sell-header'>Ores</h3>
-                <ul className='sell-list'>
-                    <SellItem type={'copper'} />
-                    <SellItem type={'iron'} />
-                    {/* <Ore type={'gold'} /> */}
-                </ul>
-            </div>
+     
+      <h3 className='sell-header'>Ores</h3>
+      <ul className='sell-list'>
+         {
+          Object.keys(ores).map(ore => {
+            return  <SellItem type={ore} />
+          })
+        }
+        </ul>
+    </div>
   )
 }
 
@@ -121,7 +126,7 @@ function useKeyPress(targetKey) {
     return keyPressed;
   }
 
-export default function Inventory(props) {
+export default function Inventory({ores}) {
 
   const healHP = { id:'heal', name: 'food', desc: 'heals player' };
   const increaseHP = {id:'health', name: 'tougher skin', desc: 'increases max hp' };
@@ -142,7 +147,7 @@ export default function Inventory(props) {
         {/* <InventoryNav /> */}
         <div className='inventory-sections'>
           <BuySections sections={sections} active={health} />
-          <SellSection />
+          <SellSection ores={ores}  />
         </div>
       </div>
     )

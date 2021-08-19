@@ -226,7 +226,14 @@ class Move extends Hitbox {
 
 		if (this.keys["KeyD"] && this.keys["Space"]) {
 			let t = this.collision.getTile(this.pos.x + this.width + this.reach, this.pos.y + this.height / 2);
-			if (t?.value !== 0 && t !== undefined && !shop.isTileWithinBoundary(t) && canMine && this.isGrounded) {
+			if (
+				t?.value !== 0 &&
+				t !== 0 &&
+				t != undefined &&
+				!shop.isTileWithinBoundary(t) &&
+				canMine &&
+				this.isGrounded
+			) {
 				this.isMoving = false;
 				this.isMining = true;
 				this.facingDirection.facing = "right";
@@ -237,7 +244,14 @@ class Move extends Hitbox {
 		}
 		if (this.keys["KeyA"] && this.keys["Space"]) {
 			let t = this.collision.getTile(this.pos.x - this.reach, this.pos.y + this.height / 2);
-			if (t?.value !== 0 && t !== undefined && !shop.isTileWithinBoundary(t) && canMine && this.isGrounded) {
+			if (
+				t?.value !== 0 &&
+				t !== 0 &&
+				t != undefined &&
+				!shop.isTileWithinBoundary(t) &&
+				canMine &&
+				this.isGrounded
+			) {
 				this.isMoving = false;
 				this.isMining = true;
 				this.facingDirection.facing = "left";
@@ -248,7 +262,14 @@ class Move extends Hitbox {
 		}
 		if (this.keys["KeyS"] && this.keys["Space"]) {
 			let t = this.collision.getTile(this.pos.x + this.width / 2, this.pos.y + this.height + this.reach);
-			if (t?.value !== 0 && t !== undefined && !shop.isTileWithinBoundary(t) && canMine && this.isGrounded) {
+			if (
+				t?.value !== 0 &&
+				t !== 0 &&
+				t !== undefined &&
+				!shop.isTileWithinBoundary(t) &&
+				canMine &&
+				this.isGrounded
+			) {
 				this.isMoving = false;
 				this.isMining = true;
 				this.facingDirection.facing = t.x + t.w / 2 < this.pos.x + this.width / 2 ? "left" : "right";

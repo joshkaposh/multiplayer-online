@@ -106,14 +106,12 @@ class TileConverter {
 				frame = this.tileFrames.grass.corners.all;
 				right.frameX = frame.col;
 				right.frameY = frame.row;
-				right.frameY = frame.row;
 				right.value = 5;
 				right.type = "grass_all";
 				break;
 			case "grass_both_under":
 				frame = this.tileFrames.grass.corners.grass_both_left;
 				right.frameX = frame.col;
-				right.frameY = frame.row;
 				right.frameY = frame.row;
 				right.value = 1;
 				right.type = "grass_both_left";
@@ -239,6 +237,10 @@ export default class Mine extends TileConverter {
 		this.mined = null;
 	}
 
+	get score() {
+		return this.count;
+	}
+
 	getSurroundingTiles(tile) {
 		return {
 			current: tile,
@@ -255,16 +257,23 @@ export default class Mine extends TileConverter {
 		};
 	}
 
-	get score() {
-		return this.count;
-	}
-
-	checkIntegrityLevel({ integrity, integPercents: percents }) {
+	checkIntegrityLevel({ type, integrity, integPercents: percents }) {
 		/* change tile sprites as they break */
-		if (integrity < percents[25]) return 3;
-		if (integrity < percents[50]) return 2;
-		if (integrity < percents[75]) return 1;
-		if (integrity > percents[75]) return 0;
+		if (type === "grass") {
+			if (integrity < percents[25]) return 3;
+			if (integrity < percents[50]) return 2;
+			if (integrity < percents[75]) return 1;
+			if (integrity > percents[75]) return 0;
+		} else {
+			if (integrity < percents[12.5]) return 7;
+			if (integrity < percents[25]) return 6;
+			if (integrity < percents[37.5]) return 5;
+			if (integrity < percents[50]) return 4;
+			if (integrity < percents[62.5]) return 3;
+			if (integrity < percents[75]) return 2;
+			if (integrity < percents[87.5]) return 1;
+			if (integrity > percents[87.5]) return 0;
+		}
 	}
 
 	changeTileToBreaking(tile) {
@@ -280,20 +289,14 @@ export default class Mine extends TileConverter {
 			tile.type === "dirt_corner_bottom_right"
 		)
 			return this.tileFrames.dirt.breaking[0].row;
-		if (tile.type === "copper") return this.tileFrames.ores.copper.breaking[0].row;
-		if (tile.type === "iron") return this.tileFrames.ores.iron.breaking[0].row;
+		// if (tile.type === "copper") return this.tileFrames.ores.copper.breaking[0].row;
+		// if (tile.type === "iron") return this.tileFrames.ores.iron.breaking[0].row;
 	}
 
 	async mine(tile, delta, cb) {
 		let new_integrity = Util.lerp(tile.integrity, tile.integrity - this.drill_speed, delta);
 
-		if (
-			tile.value === this.tileFrames.walkables[0] ||
-			tile.value === this.tileFrames.walkables[1] ||
-			tile.integrity === 0 ||
-			tile.type === "mined"
-		)
-			return;
+		if (tile.integrity === 0 || tile.type === "mined") return;
 		// if tile is walkable, return early
 
 		tile.frameY = this.changeTileToBreaking(tile);
@@ -307,30 +310,20 @@ export default class Mine extends TileConverter {
 				tile.frameX = 1;
 			} else tile.frameX = 2;
 
-			switch (tile.type) {
-				case "copper":
-					// console.log("mined copper ore");
-					await cb("copper");
-					break;
-				case "iron":
-					// console.log("mined iron ore");
-					await cb("iron");
-					break;
-				default:
-					break;
+			if (tile.isOre) {
+				await cb(tile.oreType);
 			}
 
-			const tileTypes = Object.keys(this.tileFrames);
-			console.log(tileTypes);
-
-			this.mined = tile.type;
+			this.mined = tile.oreType || tile.type;
 
 			tile.type = "mined";
 			tile.integrity = 0;
 			tile.value = 0;
+			tile.walkable = true;
 			this.switchSurroundingTileValues(this.getSurroundingTiles(tile));
 			return;
 		}
+
 		tile.integrity = new_integrity;
 	}
 }

@@ -25,18 +25,15 @@ export default function EstablishConnection() {
         })
 
         socket.on('newUser', (data) => {
-            console.log('EstablishConnection::NewUser');
             setObj({ ...data });
         })
 
         socket.on('oldUser', (data) => {
-            console.log('EstablishConnection::OldUser',data);
             setObj({ ...data });
         
         })
         
         socket.on('loadGame', (data) => {
-            console.log('EstablishConnection::LoadGame',data);
             setGameData({ ...data })
             setAuth(true)
             

@@ -11,7 +11,7 @@ export default class Player extends PlayerMovement {
 	constructor(name, c, camera, pos, tilesize, speed, width, height, mapW, mapH, columns, rows, tileFrames, color) {
 		super(
 			c,
-			new Inventory(c, 500, { copper: [], iron: [] }),
+			new Inventory(c, 500, Object.keys(tileFrames.ores), tileFrames.ores),
 			camera,
 			playerSpritesheet,
 			width,

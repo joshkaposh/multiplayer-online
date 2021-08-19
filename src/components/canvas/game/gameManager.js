@@ -95,10 +95,8 @@ export default class GameManager extends PlayerSpawnSystem {
 			frames,
 			color: "grey",
 		});
-		console.log(player);
 
 		this.world = new World(this.c, camera, { data: map, rows, columns, tilesize, mapW, mapH }, player);
-		console.log(this.world);
 		this.turn = 0;
 	}
 
@@ -108,11 +106,7 @@ export default class GameManager extends PlayerSpawnSystem {
 		const canvas = document.getElementById("canvas");
 		canvas.style.position = "absolute";
 
-		console.log(this.frames);
-		frames = this.frames;
-
-		// canvas.style.left = window.innerWidth / 2 - this.c.canvas.width / 2;
-		// canvas.style.top = window.innerHeight / 2 - this.c.canvas.height / 2;
+		this.frames = frames;
 
 		this.world.init();
 	}

@@ -7,7 +7,7 @@ import DeathMenu from '../DeathMenu';
 const socket = io('http://localhost:5000')
 const game = []
 
-const init = (name, canvasRef, gamedata, then) => {
+const init = (name, canvasRef, gamedata) => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const g = new Game(socket, ctx, name,gamedata);
@@ -27,7 +27,6 @@ export default function Canvas({gamedata}) {
 
         let totalFrameTime,lastFrameTime, animationId, fps;
 
-        console.log('FRAMES:::',gamedata.frames)
 
         const animate = () => {
             c.clearRect(0, 0, c.canvas.width, c.canvas.height);
@@ -69,7 +68,7 @@ export default function Canvas({gamedata}) {
             </div>
             <div className='container'>
                 <canvas id="canvas" ref={canvasRef}></canvas>
-                <Inventory />
+                <Inventory ores={gamedata.frames.ores} />
                 <DeathMenu ores={{
                     dirt: gamedata.frames.dirt,
                     ...gamedata.frames.ores,

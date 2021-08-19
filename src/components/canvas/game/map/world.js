@@ -19,7 +19,7 @@ export default class World {
 		this.tilesize = tilesize;
 		this.columns = columns;
 		this.rows = rows;
-		this.grid = data;
+		this.layers = data;
 		this.initialGrid = data;
 		this.width = mapW;
 		this.height = mapH;
@@ -61,33 +61,48 @@ export default class World {
 
 	init() {
 		this.player.init();
-		this.player.collision.init(this.grid);
+		this.player.collision.init(this.layers[1]);
 		this.enemies.length = 0;
 		this.spawnEnemies();
 	}
 
 	getTile(col, row) {
-		return this.grid[row * this.columns + col];
+		return this.layers[1][row * this.columns + col];
+	}
+
+	getBgTile(col, row) {
+		return this.layers[0][row * this.columns + col];
+	}
+
+	drawEnemies() {
+		if (this.enemies.length > 0) {
+			for (let i = 0; i < this.enemies.length; i++) {
+				let x = this.enemies[i].pos.x - this.camera.pos.x + this.c.canvas.width / 2 - this.camera.width / 2;
+				let y = this.enemies[i].pos.y - this.camera.pos.y + this.c.canvas.height / 2 - this.camera.height / 2;
+				this.enemies[i].draw(x, y);
+			}
+		}
 	}
 
 	drawSprite(img, sX, sY, sW, sH, dX, dY, dW, dH) {
 		this.c.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
 	}
 
-	draw() {
+	drawTiles() {
 		let { xMin, xMax, yMin, yMax } = this.camera.getDimensions();
 		for (let x = xMin; x < xMax; x++) {
 			for (let y = yMin; y < yMax; y++) {
 				// draw grid within camera dimensions
 				const tile = this.getTile(x, y);
-				//!camera centering
-				let tile_x = tile.x - this.camera.pos.x + this.c.canvas.width / 2 - this.camera.width / 2;
-				let tile_y = tile.y - this.camera.pos.y + this.c.canvas.height / 2 - this.camera.height / 2;
+				const bgTile = this.getBgTile(x, y);
+
+				let tile_x = bgTile.x - this.camera.pos.x + this.c.canvas.width / 2 - this.camera.width / 2;
+				let tile_y = bgTile.y - this.camera.pos.y + this.c.canvas.height / 2 - this.camera.height / 2;
 
 				this.drawSprite(
 					images.spritesheet,
-					tile.frameX * (this.tilesize / 2),
-					tile.frameY * (this.tilesize / 2),
+					bgTile.frameX * (this.tilesize / 2),
+					bgTile.frameY * (this.tilesize / 2),
 					this.tilesize / 2,
 					this.tilesize / 2,
 					tile_x,
@@ -95,18 +110,40 @@ export default class World {
 					this.tilesize,
 					this.tilesize
 				);
+				//!camera centering
+				if (tile && tile.type !== "mined") {
+					this.drawSprite(
+						images.spritesheet,
+						tile.frameX * (this.tilesize / 2),
+						tile.frameY * (this.tilesize / 2),
+						this.tilesize / 2,
+						this.tilesize / 2,
+						tile_x,
+						tile_y,
+						this.tilesize,
+						this.tilesize
+					);
+					if (tile.isOre) {
+						this.drawSprite(
+							images.spritesheet,
+							tile.oreFrames.col * (this.tilesize / 2),
+							tile.oreFrames.row * (this.tilesize / 2),
+							this.tilesize / 2,
+							this.tilesize / 2,
+							tile_x,
+							tile_y,
+							this.tilesize,
+							this.tilesize
+						);
+					}
+				}
 			}
 		}
+	}
 
-		if (this.enemies.length > 0) {
-			for (let i = 0; i < this.enemies.length; i++) {
-				let x = this.enemies[i].pos.x - this.camera.pos.x + this.c.canvas.width / 2 - this.camera.width / 2;
-				let y = this.enemies[i].pos.y - this.camera.pos.y + this.c.canvas.height / 2 - this.camera.height / 2;
-
-				this.enemies[i].draw(x, y);
-			}
-		}
-
+	draw() {
+		this.drawTiles();
+		// this.drawEnemies();
 		this.player.draw();
 	}
 
@@ -122,11 +159,11 @@ export default class World {
 	}
 
 	render(delta, totalDelta) {
-		if (this.enemies.length > 0) {
-			for (let i = 0; i < this.enemies.length; i++) {
-				this.enemies[i].update(this.player);
-			}
-		}
+		// if (this.enemies.length > 0) {
+		// for (let i = 0; i < this.enemies.length; i++) {
+		// 	this.enemies[i].update(this.player);
+		// }
+		// }
 
 		this.camera.update(this.player);
 		this.player.update(delta, totalDelta, this.shop);

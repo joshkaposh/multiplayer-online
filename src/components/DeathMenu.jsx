@@ -25,7 +25,6 @@ function OreStats({ ores }) {
 }
 
 export default function DeathMenu({ ores }) {
-    console.log(ores);
     return (
             <div id='death-menu' className='hide'>
                 <ul className='death-menu-stats'>
