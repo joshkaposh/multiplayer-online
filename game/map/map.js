@@ -1,5 +1,5 @@
 const { frames } = require("../spritesheet.json");
-const { generateLayers, addOresToTiles } = require("./generate_new");
+const { generateLayers, addOresToTiles } = require("./generate");
 function applyIntegrityPercents(map, columns, rows) {
 	for (let y = 0; y < rows; y++) {
 		for (let x = 0; x < columns; x++) {
