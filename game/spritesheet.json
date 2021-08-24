@@ -159,13 +159,26 @@
 
             },
             "gold": {
-            "label": "gold_ore",
-            "integrity":150,
-            "col": 5,
-            "row": 0,
-            "cost": 150
-
-        }
+                "label": "gold_ore",
+                "integrity":150,
+                "col": 5,
+                "row": 0,
+                "cost": 150
+            },
+            "ruby": {
+                "label": "ruby_ore", 
+                "integrity":250,
+                "col": 6,
+                "row": 0,
+                "cost": 450
+            },
+            "emerald": {
+                "label": "emerald_ore", 
+                "integrity":350,
+                "col": 7,
+                "row": 0,
+                "cost": 650
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ const { server, io } = initServer();
 const connectToDatabase = require("./db/connect");
 const models = require("./db/schema");
 const gameMap = require("./game/map/map");
+const serializer = require("./game/map/serialize");
 const getUniqueID = () => {
 	const s4 = () =>
 		Math.floor((1 + Math.random()) * 0x10000)
@@ -62,9 +63,8 @@ const ioHandlers = {
 					io.sockets.emit("newUser", { ...data, newUser: false });
 				}
 				// redirect to game
-				socket.emit("loadGame", { ...gameMap });
 
-				console.log(user);
+				socket.emit("loadGame", { ...gameMap() });
 			});
 		},
 		playerMoved: (socket) => {

@@ -23,9 +23,23 @@ function applyIntegrityPercents(map, columns, rows) {
 	}
 }
 
-function applyToxicity(map, ranges) {
+function applyToxicity({ xMin, xMax, yMin, yMax }, getTile) {
 	//todo: add levels to map (1: 0~300,
 	//todo: 				2: 300~600, etc)
+
+	for (let y = yMin; y < yMax; y++) {
+		for (let x = xMin; x < xMax; x++) {
+			const tile = getTile(x, y);
+
+			if (tile) {
+				// if (Math.random() <= 0.1) {
+				tile.state.toxic.is = true;
+				// } else {
+				// tile.toxic = false;
+				// }
+			}
+		}
+	}
 }
 
 function initializeMap() {
@@ -38,7 +52,7 @@ function initializeMap() {
 	let map = generateLayers(columns, rows, tilesize);
 	addOresToTiles(map[1], columns, rows, width, height, tilesize);
 	applyIntegrityPercents(map[1], columns, rows);
-
+	applyToxicity(map[1], { xMin: 0, xMax: columns, yMin: 5, yMax: rows }, (x, y) => map[1][y * columns + x]);
 	return {
 		data: map,
 		rows: rows,
@@ -50,4 +64,4 @@ function initializeMap() {
 	};
 }
 
-module.exports = initializeMap();
+module.exports = initializeMap;

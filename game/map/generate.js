@@ -1,97 +1,11 @@
 const { frames } = require("../spritesheet.json");
 
 const randomIntFromRange = (min, max) => Math.floor(Math.random() * (max - min) + min);
-const ORE_RARITY = (ore) => {
-	let rarity;
-	switch (ore) {
-		case "copper":
-			rarity = 0.3;
-			break;
-		case "iron":
-			rarity = 0.5;
-			break;
-		case "gold":
-			rarity = 0.25;
-			break;
-		default:
-			break;
-	}
 
-	return rarity;
-};
-const TILE_RANGES = (cols, rows) => {
-	const DIRT_MIN = 5;
-	const DIRT_MAX = rows / 4;
-	const HARDENED_DIRT_MIN = DIRT_MAX;
-	const HARDENED_DIRT_MAX = rows;
-
-	return {
-		sky: {
-			yMin: 0,
-			yMax: DIRT_MIN - 2,
-			xMin: 0,
-			xMax: cols,
-		},
-
-		grass: {
-			yMin: DIRT_MIN - 1,
-			yMax: DIRT_MIN - 1,
-			xMin: 0,
-			xMax: cols,
-		},
-		dirt: {
-			yMin: DIRT_MIN,
-			yMax: DIRT_MAX,
-			xMin: 0,
-			xMax: cols,
-		},
-		hardened_dirt: {
-			yMin: HARDENED_DIRT_MIN,
-			yMax: HARDENED_DIRT_MAX,
-			xMin: 0,
-			xMax: cols,
-		},
-		copper: {
-			yMin: DIRT_MIN,
-			yMax: DIRT_MAX,
-			xMin: 0,
-			xMax: cols,
-			rarity: ORE_RARITY("copper"),
-		},
-		iron: {
-			yMin: DIRT_MIN,
-			yMax: HARDENED_DIRT_MAX,
-			xMin: 0,
-			xMax: cols,
-			rarity: ORE_RARITY("iron"),
-		},
-		gold: {
-			yMin: DIRT_MIN,
-			yMax: HARDENED_DIRT_MAX,
-			xMin: 0,
-			xMax: cols,
-			rarity: ORE_RARITY("gold"),
-		},
-	};
-};
-
-const ORE_RANGES = (cols, rows) => {
-	let ore_ranges = {};
-	const tile_ranges = TILE_RANGES(cols, rows);
-	const ranges = Object.keys(TILE_RANGES(cols, rows));
-	const oreNames = Object.keys(frames.ores);
-	for (let i = 0 - 1; i < ranges.length; i++) {
-		let ore = oreNames.filter((name) => name === ranges[i])[0];
-		if (ore) {
-			ore_ranges[ore] = tile_ranges[ore];
-		}
-	}
-
-	return ore_ranges;
-};
+const { TILE_RANGES, ORE_RANGES, ORE_RARITY } = require("./ore_generate");
 
 class BaseTile {
-	constructor({ x, y, w, h, column, row, frameX, frameY, value, type, walkable }) {
+	constructor({ x, y, w, h, column, row, frameX, frameY, value, type }) {
 		this.x = x;
 		this.y = y;
 		this.w = w;
@@ -116,13 +30,42 @@ class Tile extends BaseTile {
 		super({ x, y, w, h, column, row, frameX, frameY, value, type });
 		this.integrity = integrity;
 		this.walkable = walkable;
-		this.isOre = false;
-		this.oreType = null;
-		this.oreFrames = {
-			col: null,
-			row: null,
+		this.state = {
+			ore: {
+				repeat: false,
+				is: false,
+				type: null,
+				frames: {
+					col: null,
+					row: null,
+				},
+			},
+			toxic: {
+				repeat: false,
+				is: false,
+				frames: {
+					col: null,
+					row: null,
+					start: null,
+					end: null,
+				},
+			},
 		};
-		// this.neighbours = {};
+		this.walls = {
+			scores: [],
+			data: [],
+			total: null,
+		};
+
+		let sum = 0;
+
+		for (let i = 0; i < 9; i++) {
+			let decimal = 0.5;
+			this.walls.scores.push(i + decimal);
+			this.walls.data.push(true);
+			sum += i + decimal;
+			this.walls.total = sum;
+		}
 	}
 }
 
@@ -225,9 +168,20 @@ function generateTilesLayer(layer, columns, rows, tilesize) {
 	}
 }
 
+function generateEmptyTiles(map, cols, rows) {
+	const getTile = (x, y) => map[y * cols + x];
+
+	const { dirt } = TILE_RANGES(cols, rows);
+
+	for (let y = dirt.yMin + 1; y < rows; y++) {
+		for (let x = 0; x < cols; x++) {
+			let tile = getTile(x, y);
+		}
+	}
+}
+
 function addOresToTiles(map, cols, rows) {
 	const getTile = (x, y) => map[y * cols + x];
-	console.log(frames.ores);
 
 	const RANGES = ORE_RANGES(cols, rows);
 	const ores = Object.keys(RANGES);
@@ -237,7 +191,7 @@ function addOresToTiles(map, cols, rows) {
 		const ore = RANGES[ores[i]];
 		const ORE_ROWS = ore.yMax - ore.yMin;
 		let count = ORE_ROWS * cols * ore.rarity;
-		console.log(count);
+		console.log("ore: %s, count: %s, range: %s", ores[i], count, ORE_ROWS);
 
 		for (let j = 0; j < count; j++) {
 			let x = randomIntFromRange(ore.xMin, ore.xMax);
@@ -252,10 +206,11 @@ function addOresToTiles(map, cols, rows) {
 			} else {
 				tile.integrity += frames.ores[ores[i]].integrity;
 				frame = frames.ores[ores[i]];
-				tile.oreType = ores[i];
-				tile.isOre = true;
-				tile.oreFrames.col = frame.col;
-				tile.oreFrames.row = frame.row;
+				let { ore } = tile.state;
+				ore.type = ores[i];
+				ore.is = true;
+				ore.frames.col = frame.col;
+				ore.frames.row = frame.row;
 			}
 		}
 	}
