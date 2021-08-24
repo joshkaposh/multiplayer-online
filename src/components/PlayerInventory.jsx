@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react';
+import React,{useState} from 'react';
 
 const capitalizeFirstLetter = (str) => str.charAt(0).toUpperCase() + str.slice(1)
 
@@ -18,7 +18,7 @@ function UpgradeItem({id,name,desc}) {
 
 function SellItem({ type }) {
     return (
-        <li className={`sell-list-item sell-list-item-${type}`}>
+        <li className={`sell-list-item sell-list-item-${type} sell-list-item-img-bg`}>
             <div className='sell-list-item-info'>
                 <span className={type + '-value'}></span>
                 <span className={type + '-count'}></span>
@@ -29,20 +29,7 @@ function SellItem({ type }) {
       </li>)
 }
 
-function InventoryNav() {
-  return (
-    <div className='inventory-nav'>
-      <ul className='inventory-nav-list'>
-        <button className="inventory-nav-item">Heals</button>
-        <button className="inventory-nav-item"></button>
-        <button className="inventory-nav-item"></button>
-      </ul>
-    </div>
-  )
-}
-
 function SellSection({ ores }) {
-  // console.log(ores);
   
   return (
     <div className='sell-section'>
@@ -51,7 +38,7 @@ function SellSection({ ores }) {
       <ul className='sell-list'>
          {
           Object.keys(ores).map(ore => {
-            return  <SellItem type={ore} />
+            return <SellItem key={ore} type={ore} />
           })
         }
         </ul>
@@ -66,14 +53,14 @@ function BuySection({ title, upgrades, active }) {
       
       <ul className='buy-list'>
         {upgrades.map(upgrade => {
-          return <UpgradeItem id={upgrade.id} name={capitalizeFirstLetter(upgrade.name)} desc={upgrade.desc} />
+          return <UpgradeItem key={upgrade.id} id={upgrade.id} name={capitalizeFirstLetter(upgrade.name)} desc={upgrade.desc} />
       })}
       </ul>
     </div>
   )
 }
 
-function BuySections({ sections,active }) {
+function BuySections({ sections, active }) {
   const [view, setView] = useState(active.title);
   const handleNavClick =  (e) => {
     e.preventDefault();
@@ -87,44 +74,16 @@ function BuySections({ sections,active }) {
           <li className="buy-nav-item"><button  value='tools' onClick={handleNavClick}>tools</button></li>
         </ul>
       </nav>
-      {sections.map(section => {
+      {sections.map((section, i) => {
       if (section.title === view) {
-        return <BuySection title={section.title} upgrades={section.upgrades} active={true}  />
+        return <BuySection key={i} title={section.title} upgrades={section.upgrades} active={true}  />
     }
-    return <BuySection title={section.title} upgrades={section.upgrades} />
+    return <BuySection key={i} title={section.title} upgrades={section.upgrades} />
   })}
     </div>
     
   ) 
 }
-
-function useKeyPress(targetKey) {
-    // State for keeping track of whether key is pressed
-    const [keyPressed, setKeyPressed] = useState(false);
-    // If pressed key is our target key then set to true
-    const  downHandler = ({ key }) => {
-      if (key === targetKey) {
-        setKeyPressed(true);
-      }
-    }
-    // If released key is our target key then set to false
-    const upHandler = ({ key }) => {
-      if (key === targetKey) {
-        setKeyPressed(false);
-      }
-    };
-    // Add event listeners
-    useEffect(() => {
-      window.addEventListener("keydown", downHandler);
-      window.addEventListener("keyup", upHandler);
-      // Remove event listeners on cleanup
-      return () => {
-        window.removeEventListener("keydown", downHandler);
-        window.removeEventListener("keyup", upHandler);
-      };
-    }, []); // Empty array ensures that effect is only run on mount and unmount
-    return keyPressed;
-  }
 
 export default function Inventory({ores}) {
 
@@ -138,7 +97,7 @@ export default function Inventory({ores}) {
   const health = { title: 'health', upgrades: [healHP, increaseHP] }
   const tools = {title: 'tools',upgrades: [test1, test2]}
   
-  const sections = new Array(health,tools)
+  const sections = [health,tools]
   
     return (
       <div className="inventory-closed" id="inventory">

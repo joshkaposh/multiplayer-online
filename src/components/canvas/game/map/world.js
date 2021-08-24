@@ -3,8 +3,8 @@ import Vector from "../game-objects/basic/Vector";
 import { randomInt } from "../collision/util";
 import Shop from "../game-objects/shop/shop";
 import Enemy from "../game-objects/enemy/enemy";
-const images = {};
 
+const images = {};
 images.spritesheet = new Image();
 images.spritesheet.onerror = console.error;
 images.spritesheet.src = game_spritesheet;
@@ -14,6 +14,7 @@ images.spritesheet.src = game_spritesheet;
 export default class World {
 	constructor(c, camera, { tilesize, rows, columns, data, mapW, mapH }, player) {
 		this.c = c;
+		this.spritesheet = images.spritesheet;
 		this.camera = camera;
 		this.player = player;
 		this.tilesize = tilesize;
@@ -60,6 +61,8 @@ export default class World {
 	}
 
 	init() {
+		// todo: deserialize tile functions
+		console.log(this.layers);
 		this.player.init();
 		this.player.collision.init(this.layers[1]);
 		this.enemies.length = 0;
@@ -100,7 +103,7 @@ export default class World {
 				let tile_y = bgTile.y - this.camera.pos.y + this.c.canvas.height / 2 - this.camera.height / 2;
 
 				this.drawSprite(
-					images.spritesheet,
+					this.spritesheet,
 					bgTile.frameX * (this.tilesize / 2),
 					bgTile.frameY * (this.tilesize / 2),
 					this.tilesize / 2,
@@ -113,7 +116,7 @@ export default class World {
 				//!camera centering
 				if (tile && tile.type !== "mined") {
 					this.drawSprite(
-						images.spritesheet,
+						this.spritesheet,
 						tile.frameX * (this.tilesize / 2),
 						tile.frameY * (this.tilesize / 2),
 						this.tilesize / 2,
@@ -123,11 +126,11 @@ export default class World {
 						this.tilesize,
 						this.tilesize
 					);
-					if (tile.isOre) {
+					if (tile.state.ore.is) {
 						this.drawSprite(
-							images.spritesheet,
-							tile.oreFrames.col * (this.tilesize / 2),
-							tile.oreFrames.row * (this.tilesize / 2),
+							this.spritesheet,
+							tile.state.ore.frames.col * (this.tilesize / 2),
+							tile.state.ore.frames.row * (this.tilesize / 2),
 							this.tilesize / 2,
 							this.tilesize / 2,
 							tile_x,
@@ -136,6 +139,10 @@ export default class World {
 							this.tilesize
 						);
 					}
+				} else if (tile && tile.type === "mined" && tile.toxic) {
+					// draw tile
+					// update tile
+					tile.update();
 				}
 			}
 		}
@@ -145,6 +152,7 @@ export default class World {
 		this.drawTiles();
 		// this.drawEnemies();
 		this.player.draw();
+		this.player.drawMoney();
 	}
 
 	resetWorld() {
@@ -158,7 +166,7 @@ export default class World {
 		menu.setAttribute("class", "show");
 	}
 
-	render(delta, totalDelta) {
+	render(delta) {
 		// if (this.enemies.length > 0) {
 		// for (let i = 0; i < this.enemies.length; i++) {
 		// 	this.enemies[i].update(this.player);
@@ -166,18 +174,17 @@ export default class World {
 		// }
 
 		this.camera.update(this.player);
-		this.player.update(delta, totalDelta, this.shop);
+		this.player.update(delta, this.shop);
 		this.draw();
 		this.shop.update(this.camera);
-		this.player.inventory.drawMoney();
 	}
 
-	update(delta, totalDelta) {
+	update(delta) {
 		// if (!this.player.isAlive) {
 		// should die
 		// this.resetWorld()
 		// this.displayDeathMenu();
 		// }
-		this.render(delta, totalDelta);
+		this.render(delta);
 	}
 }

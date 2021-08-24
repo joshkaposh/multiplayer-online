@@ -1,83 +1,14 @@
-import Mine from "./player_mine";
-import Collision from "../../collision/collision";
 import Util from "../../collision/util";
-import Gravity from "../../physics/gravity";
 import Vector from "../basic/Vector";
+import PlayerEntity from "./player_entity";
 
-class Hitbox {
-	constructor(health) {
-		this.health = health;
-		this.maxHP = health;
-		this.minHP = 0;
-		this.healthDOT = 0.005;
-		this.isAlive = true;
-	}
-
-	fallDamage(yVelocity) {
-		let y = yVelocity * 100;
-		let dmg = y * 3;
-
-		this.health -= dmg;
-	}
-
-	damageOverTime() {
-		if (this.health - this.healthDOT <= 0) {
-			// this.isAlive = false;
-		}
-		this.health -= this.healthDOT;
-	}
-
-	heal(hp) {
-		this.health += hp;
-	}
-}
-
-class Move extends Hitbox {
-	constructor(c, inventory, spritesheet, speed, columns, rows, mapW, mapH, tilesize, tileFrames) {
-		// TODO: SYNC UP HEALTH SYSTEMS, SMOOTH OUT FLIGHT MECHANIC
-		super(500);
+class Move extends PlayerEntity {
+	constructor(health, pos, width, height, speed, columns, rows, mapW, mapH, tilesize, tileFrames) {
+		super(health, pos, width, height, speed, tilesize, columns, rows, mapW, mapH, tileFrames, tileFrames.ores);
 		this.speed = speed;
 		this.tilesize = tilesize;
-		this.inventory = inventory;
-		this.collision = new Collision(speed, tilesize, columns, rows, mapW, mapH);
-		this.drill = new Mine(
-			c,
-			this.inventory,
-			this.collision,
-			spritesheet,
-			32,
-			32,
-			speed,
-			tilesize,
-			columns,
-			rows,
-			mapW,
-			mapH,
-			tileFrames
-		);
 		this.velocity = new Vector(0, 0);
 		this.reach = 10;
-		this.moves = {
-			keyW: (vector) => {
-				this.isMoving = true;
-				this.isFlying = true;
-				this.pos.y = vector.y;
-			},
-			keyA: (vector) => {
-				this.isMoving = true;
-				this.facingDirection.facing = "left";
-				this.pos.x = vector.x;
-			},
-			keyS: (vector) => {
-				this.isMoving = true;
-				this.pos.y = vector.y;
-			},
-			keyD: (vector) => {
-				this.isMoving = true;
-				this.facingDirection.facing = "right";
-				this.pos.x = vector.x;
-			},
-		};
 		this.canMove = true;
 		this.isFlying = false;
 		this.isFalling = false;
@@ -88,7 +19,15 @@ class Move extends Hitbox {
 		this.keys = {};
 		this.keysElapsed = {};
 		this.jumpHeight = this.speed.y * 1.5;
-		this.gravity = new Gravity(1, 1, 0.5, 0.05);
+	}
+
+	preventDoubleMining() {
+		if (
+			(this.keys["KeyS"] && this.keys["Space"] && this.keys["KeyA"]) ||
+			(this.keys["KeyD"] && this.keys["Space"] && this.keys["KeyS"])
+		)
+			return false;
+		else return true;
 	}
 
 	isPlayerAboutToHitGround() {
@@ -125,7 +64,7 @@ class Move extends Hitbox {
 	}
 
 	handleFallDamage(velocity) {
-		if (velocity.y >= this.gravity.MAX_VELOCITY && !this.isFlying) {
+		if (velocity.y >= this.fallingMinVelocity && !this.isFlying) {
 			this.fallDamage(velocity.y);
 		}
 	}
@@ -139,7 +78,9 @@ class Move extends Hitbox {
 
 		if (!this.collision.collide_top([pos, new Vector(pos.x + this.width, pos.y)])) {
 			velocity = new Vector(0, pos.y - this.pos.y);
-			this.moves["keyW"](pos);
+			this.isMoving = true;
+			this.isFlying = true;
+			this.movement_set["up"](pos);
 			trackedMoves.push(velocity);
 		}
 	}
@@ -152,17 +93,19 @@ class Move extends Hitbox {
 		if (x <= 0) return this.displayToUser("cant move past world x limit: 0");
 		if (shop.isPlayerWithinShop(pos)) {
 			shop.open();
-			this.inventory.show();
+			// this.inventory.show();
 			this.isShopping = true;
 			return;
 		} else {
 			shop.closed();
-			this.inventory.hide();
+			// this.inventory.hide();
 			this.isShopping = false;
 		}
 		if (!this.collision.collide_left([pos, new Vector(pos.x, pos.y + this.height)])) {
 			velocity = new Vector(pos.x - this.pos.x, 0);
-			this.moves["keyA"](pos);
+			this.isMoving = true;
+			this.facingDirection.facing = "left";
+			this.movement_set["left"](pos);
 			trackedMoves.push(velocity);
 		}
 	}
@@ -189,7 +132,9 @@ class Move extends Hitbox {
 			])
 		) {
 			velocity = new Vector(pos.x - this.pos.x, 0);
-			this.moves["keyD"](pos);
+			this.isMoving = true;
+			this.facingDirection.facing = "right";
+			this.movement_set["right"](pos);
 			trackedMoves.push(velocity);
 		}
 	}
@@ -206,20 +151,17 @@ class Move extends Hitbox {
 			])
 		) {
 			velocity = new Vector(0, pos.y - this.pos.y);
-			this.moves["keyS"](pos);
+			this.isMoving = true;
+			this.movement_set["down"](pos);
 			trackedMoves.push(velocity);
 		}
 	}
+}
 
-	preventDoubleMining() {
-		if (
-			(this.keys["KeyS"] && this.keys["Space"] && this.keys["KeyA"]) ||
-			(this.keys["KeyD"] && this.keys["Space"] && this.keys["KeyS"])
-		)
-			return false;
-		else return true;
+class ActionHandlers extends Move {
+	constructor(health, pos, width, height, speed, columns, rows, mapW, mapH, tilesize, tileFrames) {
+		super(health, pos, width, height, speed, columns, rows, mapW, mapH, tilesize, tileFrames);
 	}
-
 	miningHandler(shop) {
 		// ? ----- Mining Section ----- ? //
 		let canMine = this.preventDoubleMining();
@@ -229,7 +171,7 @@ class Move extends Hitbox {
 			if (
 				t?.value !== 0 &&
 				t !== 0 &&
-				t != undefined &&
+				t !== undefined &&
 				!shop.isTileWithinBoundary(t) &&
 				canMine &&
 				this.isGrounded
@@ -237,7 +179,12 @@ class Move extends Hitbox {
 				this.isMoving = false;
 				this.isMining = true;
 				this.facingDirection.facing = "right";
-				this.drill.mine(t, this.delta, this.inventory.add.bind(this.inventory));
+				this.drill.mine(
+					t,
+					this.stats.mining_speed.current,
+					this.inventory.add.bind(this.inventory),
+					this.delta
+				);
 			} else {
 				this.facingDirection.down = false;
 			}
@@ -247,7 +194,7 @@ class Move extends Hitbox {
 			if (
 				t?.value !== 0 &&
 				t !== 0 &&
-				t != undefined &&
+				t !== undefined &&
 				!shop.isTileWithinBoundary(t) &&
 				canMine &&
 				this.isGrounded
@@ -255,7 +202,12 @@ class Move extends Hitbox {
 				this.isMoving = false;
 				this.isMining = true;
 				this.facingDirection.facing = "left";
-				this.drill.mine(t, this.delta, this.inventory.add.bind(this.inventory));
+				this.drill.mine(
+					t,
+					this.stats.mining_speed.current,
+					this.inventory.add.bind(this.inventory),
+					this.delta
+				);
 			} else {
 				this.facingDirection.down = false;
 			}
@@ -274,7 +226,12 @@ class Move extends Hitbox {
 				this.isMining = true;
 				this.facingDirection.facing = t.x + t.w / 2 < this.pos.x + this.width / 2 ? "left" : "right";
 				this.facingDirection.down = true;
-				this.drill.mine(t, this.delta, this.inventory.add.bind(this.inventory));
+				this.drill.mine(
+					t,
+					this.stats.mining_speed.current,
+					this.inventory.add.bind(this.inventory),
+					this.delta
+				);
 			} else {
 				this.facingDirection.down = false;
 			}
@@ -299,7 +256,7 @@ class Move extends Hitbox {
 		} else {
 			// player is grounded, reset gravity
 			new_y = Util.lerp(this.pos.y, this.pos.y + this.gravity.velocity, this.delta);
-			finalVelocity = new Vector(totalVelocity.x, totalVelocity.y + new_y - this.pos.y);
+			finalVelocity = new Vector(totalVelocity.x * 100, (totalVelocity.y + new_y - this.pos.y) * 100);
 			this.handleFallDamage(finalVelocity);
 			this.gravity.reset();
 			this.isGrounded = true;
@@ -341,28 +298,11 @@ class Move extends Hitbox {
 	}
 }
 
-export default class PlayerMovement extends Move {
-	constructor(
-		c,
-		inventory,
-		camera,
-		spritesheet,
-		width,
-		height,
-		tilesize,
-		speed,
-		mapW,
-		mapH,
-		columns,
-		rows,
-		tileFrames
-	) {
-		super(c, inventory, spritesheet, speed, columns, rows, mapW, mapH, tilesize, tileFrames);
+class InitKeyListeners extends ActionHandlers {
+	constructor(c, camera, health, pos, width, height, speed, tilesize, mapW, mapH, columns, rows, tileFrames) {
+		super(health, pos, width, height, speed, columns, rows, mapW, mapH, tilesize, tileFrames);
 		this.c = c;
 		this.camera = camera;
-		this.width = width;
-		this.height = height;
-
 		this.tilesize = tilesize;
 	}
 
@@ -393,3 +333,5 @@ export default class PlayerMovement extends Move {
 		});
 	}
 }
+
+export default InitKeyListeners;

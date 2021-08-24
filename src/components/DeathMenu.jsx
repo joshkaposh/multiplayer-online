@@ -20,7 +20,7 @@ function SurvivalStats() {
 
 function OreStats({ ores }) {
     return Object.keys(ores).map(key => {
-       return <Stat label={key} id={`${key}-total-mined`} />
+       return <Stat key={key} label={key} id={`${key}-total-mined`} />
     })
 }
 

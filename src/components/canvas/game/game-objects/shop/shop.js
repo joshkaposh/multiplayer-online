@@ -28,13 +28,15 @@ export default class Shop {
 	}
 
 	open() {
-		const inventory = document.getElementById("inventory");
-		inventory.setAttribute("class", "inventory-open");
+		const inventory = document.getElementById("player-inventory");
+		inventory.classList.add("open");
+		inventory.classList.remove("closed");
 	}
 
 	closed() {
-		const inventory = document.getElementById("inventory");
-		inventory.setAttribute("class", "inventory-closed");
+		const inventory = document.getElementById("player-inventory");
+		inventory.classList.remove("open");
+		inventory.classList.add("closed");
 	}
 
 	isTileWithinBoundary(tile) {
