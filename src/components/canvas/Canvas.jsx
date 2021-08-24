@@ -2,8 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import useUser from '../../context/user';
 import Game from './game/gameManager';
-import DeathMenu from '../DeathMenu';
-import PlayerInventory from '../PlayerInventory_new';
+import DeathMenu from './game/ui/DeathMenu';
+import PlayerInventory from './game/ui/PlayerInventory';
 
 const socket = io('http://localhost:5000')
 const game = []

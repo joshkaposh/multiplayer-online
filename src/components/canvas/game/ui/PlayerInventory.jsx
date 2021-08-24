@@ -1,8 +1,6 @@
-import mystery_ore0 from './canvas/images/mystery-ore-0.png';
-import mystery_ore1 from './canvas/images/mystery-ore-1.png';
-import mystery_ore2 from './canvas/images/mystery-ore-2.png';
-
-
+import mystery_ore0 from '../../images/mystery-ore-0.png';
+import mystery_ore1 from '../../images/mystery-ore-1.png';
+import mystery_ore2 from '../../images/mystery-ore-2.png';
 
 const images = {};
 
