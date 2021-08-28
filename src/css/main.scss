@@ -337,6 +337,20 @@ nav {
 
 $ore_height: 64px;
 
+#player-inventory-exit {
+	padding: 0.35rem 0.5rem;
+	position: absolute;
+	right: 0;
+	top: 0;
+	background-color: crimson;
+	border: 1px solid black;
+}
+
+#player-inventory-exit:hover {
+	background-color: rgb(235, 57, 93);
+	color: rgb(51, 51, 51);
+}
+
 .open {
 	display: flex;
 	flex-direction: column;

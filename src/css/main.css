@@ -103,6 +103,20 @@ nav {
   flex-direction: column;
 }
 
+#player-inventory-exit {
+  padding: 0.35rem 0.5rem;
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: crimson;
+  border: 1px solid black;
+}
+
+#player-inventory-exit:hover {
+  background-color: #eb395d;
+  color: #333333;
+}
+
 .open {
   display: flex;
   flex-direction: column;

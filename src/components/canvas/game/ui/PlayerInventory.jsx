@@ -98,6 +98,7 @@ export default function PlayerSkills({ skills,ores }) {
     
     return (
             <div id='player-inventory' className='player-skills-container closed'>
+                <button id='player-inventory-exit'>X</button>
                 <div className='player-money'>
                     <h3>Money: <span id='currency' /></h3>
                 </div>

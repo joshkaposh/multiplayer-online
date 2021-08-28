@@ -14,6 +14,13 @@ export default class PlayerInventory extends PlayerSkills {
 		}
 	}
 
+	exitMenu(e) {
+		e.preventDefault();
+		const inventory = document.getElementById("player-inventory");
+		inventory.classList.remove("open");
+		inventory.classList.add("closed");
+	}
+
 	async sell(ore) {
 		if (this.ores[ore].length > 0) {
 			await this.ores[ore].pop(1);
@@ -62,6 +69,8 @@ export default class PlayerInventory extends PlayerSkills {
 
 	init(stats) {
 		const healBtn = document.getElementById("heal");
+		const exitBtn = document.getElementById("player-inventory-exit");
+		exitBtn.addEventListener("click", this.exitMenu);
 
 		healBtn.addEventListener("click", this.buyHealth.bind(this, stats["health"]));
 
