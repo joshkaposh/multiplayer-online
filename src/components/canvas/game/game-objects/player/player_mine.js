@@ -66,7 +66,7 @@ export default class Mine extends TileConverter {
 		if (tile.type === "hardened_dirt") return this.tileFrames.hardened_dirt.breaking[0].row;
 	}
 
-	async mine(tile, speed, cb, delta) {
+	async mine(tile, speed, cb, player, delta) {
 		if (tile.integrity === 0 || tile.type === "mined") return;
 		// if tile is walkable, return early
 
@@ -94,9 +94,13 @@ export default class Mine extends TileConverter {
 			}
 
 			if (toxic.is) {
+				player.stats.poison.current = 1;
+				player.stats.poison.poisoned = true;
+				player.totalDelta = delta;
 				// todo: start animation for toxic cloud
 				// todo: create tile state function that returns state based on booleans (similar to player_sprite)
 				// todo: take poison damage
+				// tile.frameX = toxic.frames.start;
 			}
 
 			this.mined = ore.type || tile.type;

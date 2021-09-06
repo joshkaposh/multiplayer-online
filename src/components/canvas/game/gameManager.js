@@ -5,9 +5,6 @@ import Vector from "./game-objects/basic/Vector";
 import { frames } from "./frames/frames.json";
 
 class PlayerSpawnSystem {
-	constructor(stats) {
-		// this.player_stats = stats;
-	}
 	setInitialStats(stats) {}
 
 	initialStats() {

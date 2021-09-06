@@ -9,6 +9,13 @@ export default class PlayerEntity extends Entity {
 		this.dmgOverTime = 0.005;
 		this.fallingMinVelocity = 17.5;
 		this.stats.mining_speed = { current: 10 };
+		this.stats.poison = {
+			poisoned: false,
+			current: 1,
+			interval: 1,
+			duration: 10,
+		};
+
 		this.inventory = new PlayerInventory(
 			{
 				health: {
@@ -50,11 +57,16 @@ export default class PlayerEntity extends Entity {
 	}
 
 	fallDamage(yVelocity) {
-		let dmg = yVelocity * 3;
+		const dmg = yVelocity * 3;
 		this.damage(dmg);
 	}
 
 	damageOverTime() {
 		this.damage(this.dmgOverTime);
+	}
+
+	poisonDamage() {
+		const dmg = 3;
+		this.damage(dmg);
 	}
 }

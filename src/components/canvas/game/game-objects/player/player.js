@@ -105,11 +105,32 @@ export default class Player extends PlayerMovement {
 		this.drawHealth();
 	}
 
+	poisonHandler() {
+		// const tile = this.collision.getTile(this.pos.x, this.pos.y, false);
+		// if (tile !== 0 && tile.state.toxic.is) {
+		// 	this.stats.poison.poisoned = true;
+		// }
+
+		if (this.stats.poison.poisoned && this.totalDelta >= this.stats.poison.interval) {
+			//* player is poisoned and enough time has passed
+			this.poisonDamage();
+			this.stats.poison.current++;
+			if (this.stats.poison.current >= this.stats.poison.duration) {
+				//* poision duration ended
+				this.stats.poison.poisoned = false;
+				this.stats.poison.current = 1;
+			}
+			this.totalDelta = this.delta;
+		}
+	}
+
 	update(delta, shop) {
 		this.delta = delta;
 		this.lastDraw += delta;
+		this.totalDelta += delta;
 
 		this._move(shop);
+		this.poisonHandler();
 
 		// TODO: figure out whats making player 'jumpy'
 		if (this.lastDraw >= 0.25) this.drawStats();

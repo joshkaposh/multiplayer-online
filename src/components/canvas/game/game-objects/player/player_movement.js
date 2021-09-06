@@ -93,12 +93,10 @@ class Move extends PlayerEntity {
 		if (x <= 0) return this.displayToUser("cant move past world x limit: 0");
 		if (shop.isPlayerWithinShop(pos)) {
 			shop.open();
-			// this.inventory.show();
 			this.isShopping = true;
 			return;
 		} else {
 			shop.closed();
-			// this.inventory.hide();
 			this.isShopping = false;
 		}
 		if (!this.collision.collide_left([pos, new Vector(pos.x, pos.y + this.height)])) {
@@ -139,11 +137,19 @@ class Move extends PlayerEntity {
 		}
 	}
 
-	moveDown(trackedMoves) {
+	moveDown(trackedMoves, shop) {
 		let pos, velocity;
 		let y = Util.lerp(this.pos.y, this.pos.y + this.speed.y, this.delta);
 		pos = new Vector(this.pos.x, y);
 		if (y + this.height > this.worldH) return this.displayToUser(`cant move past world y limit: ${this.worldH}`);
+		if (shop.isPlayerWithinShop(pos)) {
+			shop.open();
+			this.isShopping = true;
+			return;
+		} else {
+			shop.closed();
+			this.isShopping = false;
+		}
 		if (
 			!this.collision.collide_down([
 				new Vector(pos.x, pos.y + this.height),
@@ -156,6 +162,61 @@ class Move extends PlayerEntity {
 			trackedMoves.push(velocity);
 		}
 	}
+
+	mineLeft(shop) {
+		let t = this.collision.getTile(this.pos.x - this.reach, this.pos.y + this.height / 2);
+		if (t?.value !== 0 && t !== 0 && t !== undefined && !shop.isTileWithinBoundary(t) && this.isGrounded) {
+			this.isMoving = false;
+			this.isMining = true;
+			this.facingDirection.facing = "left";
+			this.drill.mine(
+				t,
+				this.stats.mining_speed.current,
+				this.inventory.add.bind(this.inventory),
+				this,
+				this.delta
+			);
+		} else {
+			this.facingDirection.down = false;
+		}
+	}
+
+	mineRight(shop) {
+		let t = this.collision.getTile(this.pos.x + this.width + this.reach, this.pos.y + this.height / 2);
+		if (t?.value !== 0 && t !== 0 && t !== undefined && !shop.isTileWithinBoundary(t) && this.isGrounded) {
+			this.isMoving = false;
+			this.isMining = true;
+			this.facingDirection.facing = "right";
+			this.drill.mine(
+				t,
+				this.stats.mining_speed.current,
+				this.inventory.add.bind(this.inventory),
+				this,
+				this.delta
+			);
+		} else {
+			this.facingDirection.down = false;
+		}
+	}
+
+	mineDown(shop) {
+		let t = this.collision.getTile(this.pos.x + this.width / 2, this.pos.y + this.height + this.reach);
+		if (t?.value !== 0 && t !== 0 && t !== undefined && !shop.isTileWithinBoundary(t) && this.isGrounded) {
+			this.isMoving = false;
+			this.isMining = true;
+			this.facingDirection.facing = t.x + t.w / 2 < this.pos.x + this.width / 2 ? "left" : "right";
+			this.facingDirection.down = true;
+			this.drill.mine(
+				t,
+				this.stats.mining_speed.current,
+				this.inventory.add.bind(this.inventory),
+				this,
+				this.delta
+			);
+		} else {
+			this.facingDirection.down = false;
+		}
+	}
 }
 
 class ActionHandlers extends Move {
@@ -166,75 +227,14 @@ class ActionHandlers extends Move {
 		// ? ----- Mining Section ----- ? //
 		let canMine = this.preventDoubleMining();
 
-		if (this.keys["KeyD"] && this.keys["Space"]) {
-			let t = this.collision.getTile(this.pos.x + this.width + this.reach, this.pos.y + this.height / 2);
-			if (
-				t?.value !== 0 &&
-				t !== 0 &&
-				t !== undefined &&
-				!shop.isTileWithinBoundary(t) &&
-				canMine &&
-				this.isGrounded
-			) {
-				this.isMoving = false;
-				this.isMining = true;
-				this.facingDirection.facing = "right";
-				this.drill.mine(
-					t,
-					this.stats.mining_speed.current,
-					this.inventory.add.bind(this.inventory),
-					this.delta
-				);
-			} else {
-				this.facingDirection.down = false;
-			}
+		if (this.keys["KeyA"] && this.keys["Space"] && canMine) {
+			this.mineLeft(shop);
 		}
-		if (this.keys["KeyA"] && this.keys["Space"]) {
-			let t = this.collision.getTile(this.pos.x - this.reach, this.pos.y + this.height / 2);
-			if (
-				t?.value !== 0 &&
-				t !== 0 &&
-				t !== undefined &&
-				!shop.isTileWithinBoundary(t) &&
-				canMine &&
-				this.isGrounded
-			) {
-				this.isMoving = false;
-				this.isMining = true;
-				this.facingDirection.facing = "left";
-				this.drill.mine(
-					t,
-					this.stats.mining_speed.current,
-					this.inventory.add.bind(this.inventory),
-					this.delta
-				);
-			} else {
-				this.facingDirection.down = false;
-			}
+		if (this.keys["KeyD"] && this.keys["Space"] && canMine) {
+			this.mineRight(shop);
 		}
-		if (this.keys["KeyS"] && this.keys["Space"]) {
-			let t = this.collision.getTile(this.pos.x + this.width / 2, this.pos.y + this.height + this.reach);
-			if (
-				t?.value !== 0 &&
-				t !== 0 &&
-				t !== undefined &&
-				!shop.isTileWithinBoundary(t) &&
-				canMine &&
-				this.isGrounded
-			) {
-				this.isMoving = false;
-				this.isMining = true;
-				this.facingDirection.facing = t.x + t.w / 2 < this.pos.x + this.width / 2 ? "left" : "right";
-				this.facingDirection.down = true;
-				this.drill.mine(
-					t,
-					this.stats.mining_speed.current,
-					this.inventory.add.bind(this.inventory),
-					this.delta
-				);
-			} else {
-				this.facingDirection.down = false;
-			}
+		if (this.keys["KeyS"] && this.keys["Space"] && canMine) {
+			this.mineDown(shop);
 		}
 	}
 
@@ -277,7 +277,7 @@ class ActionHandlers extends Move {
 			this.moveRight(trackedMoves, shop);
 		}
 		if (this.keys["KeyS"]) {
-			this.moveDown(trackedMoves);
+			this.moveDown(trackedMoves, shop);
 		}
 	}
 
@@ -298,7 +298,7 @@ class ActionHandlers extends Move {
 	}
 }
 
-class InitKeyListeners extends ActionHandlers {
+export default class InitKeyListeners extends ActionHandlers {
 	constructor(c, camera, health, pos, width, height, speed, tilesize, mapW, mapH, columns, rows, tileFrames) {
 		super(health, pos, width, height, speed, columns, rows, mapW, mapH, tilesize, tileFrames);
 		this.c = c;
@@ -333,5 +333,3 @@ class InitKeyListeners extends ActionHandlers {
 		});
 	}
 }
-
-export default InitKeyListeners;

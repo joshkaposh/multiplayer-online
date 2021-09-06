@@ -16,8 +16,8 @@ export default class PlayerCollision {
 
 	getTile(x, y, bool) {
 		if (bool) return this.grid[y * this.columns + x];
-		let x0 = Math.trunc(x / 64);
-		let y0 = Math.trunc(y / 64);
+		let x0 = Math.trunc(x / this.tilesize);
+		let y0 = Math.trunc(y / this.tilesize);
 		return this.grid[y0 * this.columns + x0];
 	}
 

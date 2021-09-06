@@ -28,7 +28,9 @@ export default class World {
 		const shopWidth = tilesize * 4;
 		const shopPos = new Vector(mapW / 2, tilesize * 2);
 		this.shop = new Shop(c, shopPos, shopWidth, shopHeight, tilesize, "grey");
-		this.delta = 0;
+		this.delta = null;
+		this.totalDelta = null;
+		this.lastDraw = null;
 		this.mouse = {
 			x: null,
 			y: null,
@@ -63,6 +65,14 @@ export default class World {
 	init() {
 		// todo: deserialize tile functions
 		console.log(this.layers);
+		// for (let i = 0; i < this.layers[1].length; i++) {
+		// 	const tile = this.layers[1][i];
+		// 	if (tile !== 0) {
+		// 		tile.update = function () {
+
+		// 		};
+		// 	}
+		// }
 		this.player.init();
 		this.player.collision.init(this.layers[1]);
 		this.enemies.length = 0;
@@ -89,6 +99,20 @@ export default class World {
 
 	drawSprite(img, sX, sY, sW, sH, dX, dY, dW, dH) {
 		this.c.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
+	}
+
+	animateTile(tile) {
+		const { toxic } = tile.state;
+		tile.lastDraw += this.delta;
+		// console.log(toxic.frames.col);
+		if (tile.lastDraw >= 8) {
+			toxic.frames.col++;
+			if (toxic.frames.col > toxic.frames.end) {
+				toxic.frames.col = toxic.frames.end;
+				toxic.is = false;
+			}
+			tile.lastDraw = this.delta;
+		}
 	}
 
 	drawTiles() {
@@ -139,20 +163,33 @@ export default class World {
 							this.tilesize
 						);
 					}
-				} else if (tile && tile.type === "mined" && tile.toxic) {
-					// draw tile
-					// update tile
-					tile.update();
+				}
+				if (tile && tile.type === "mined" && tile.state.toxic.is) {
+					this.drawSprite(
+						this.spritesheet,
+						tile.state.toxic.frames.col * (this.tilesize / 2),
+						tile.state.toxic.frames.row * (this.tilesize / 2),
+						this.tilesize / 2,
+						this.tilesize / 2,
+						tile_x,
+						tile_y,
+						this.tilesize,
+						this.tilesize
+					);
+					this.animateTile(tile);
 				}
 			}
 		}
 	}
 
+	drawUI() {
+		this.player.drawMoney();
+	}
+
 	draw() {
 		this.drawTiles();
-		// this.drawEnemies();
 		this.player.draw();
-		this.player.drawMoney();
+		// this.drawEnemies();
 	}
 
 	resetWorld() {
@@ -177,9 +214,13 @@ export default class World {
 		this.player.update(delta, this.shop);
 		this.draw();
 		this.shop.update(this.camera);
+		this.drawUI();
 	}
 
 	update(delta) {
+		this.delta = delta;
+		this.lastDraw += delta;
+
 		// if (!this.player.isAlive) {
 		// should die
 		// this.resetWorld()
