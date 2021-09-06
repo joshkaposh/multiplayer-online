@@ -26,10 +26,11 @@ class BackgroundTile extends BaseTile {
 }
 
 class Tile extends BaseTile {
-	constructor({ x, y, w, h, column, row, frameX, frameY, value, type, walkable, integrity }) {
+	constructor({ x, y, w, h, column, row, frameX, frameY, value, type, walkable, integrity, toxicity }) {
 		super({ x, y, w, h, column, row, frameX, frameY, value, type });
 		this.integrity = integrity;
 		this.walkable = walkable;
+		this.lastDraw = null;
 		this.state = {
 			ore: {
 				repeat: false,
@@ -51,6 +52,18 @@ class Tile extends BaseTile {
 				},
 			},
 		};
+		// type, ore, toxic
+
+		if (toxicity) {
+			this.state.toxic.is = true;
+			let {
+				animation: { start, end, row },
+			} = frames.foreground.toxic_cloud;
+			this.state.toxic.frames.col = start;
+			this.state.toxic.frames.start = start;
+			this.state.toxic.frames.end = end;
+			this.state.toxic.frames.row = row;
+		}
 		this.walls = {
 			scores: [],
 			data: [],
@@ -112,7 +125,7 @@ function generateBackgroundLayer(layer, columns, rows, tilesize) {
 
 function generateTilesLayer(layer, columns, rows, tilesize) {
 	let frame = 0;
-	let value, integrity, type, walkable;
+	let value, integrity, type, walkable, toxicity;
 
 	const { grass, dirt, hardened_dirt, sky } = TILE_RANGES(columns, rows);
 
@@ -120,6 +133,8 @@ function generateTilesLayer(layer, columns, rows, tilesize) {
 		for (let x = 0; x < columns; x++) {
 			// set default tile values
 			walkable = false;
+			toxicity = false;
+
 			value = 5;
 			integrity = 100;
 
@@ -135,15 +150,17 @@ function generateTilesLayer(layer, columns, rows, tilesize) {
 			} else if (y > 4 && y < dirt.yMax) {
 				type = "dirt";
 				frame = frames.dirt.default;
+				Math.random() >= 0.5 ? (toxicity = true) : (toxicity = false);
 			} else if (y === hardened_dirt.yMin) {
 				integrity = 200;
 				type = "hardened_dirt_topsoil";
-
 				frame = frames.hardened_dirt_topsoil.default;
+				Math.random() >= 0.5 ? (toxicity = true) : (toxicity = false);
 			} else {
 				integrity = 200;
 				type = "hardened_dirt";
 				frame = frames.hardened_dirt.default;
+				Math.random() >= 0.5 ? (toxicity = true) : (toxicity = false);
 			}
 
 			layer.push(
@@ -162,6 +179,7 @@ function generateTilesLayer(layer, columns, rows, tilesize) {
 							type,
 							walkable,
 							integrity,
+							toxicity,
 					  })
 			);
 		}

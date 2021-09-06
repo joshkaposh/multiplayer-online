@@ -5,6 +5,16 @@
             "sky_underground": { "col": 1, "row": 0 },
             "underground": { "col": 2, "row": 0 }
         },
+        "foreground": {
+            "toxic_cloud": {
+                "repeat": false,
+                "animation": {
+                    "start": 0,
+                    "end": 4,
+                    "row": 13
+                }
+            }
+        },
         "grass": {
             "integrity":100,
             "default": { "col": 0, "row": 1 },
