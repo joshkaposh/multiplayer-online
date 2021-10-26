@@ -126,7 +126,7 @@ export default function Inventory(props) {
   const healHP = { id:'heal', name: 'food', desc: 'heals player' };
   const increaseHP = {id:'health', name: 'tougher skin', desc: 'increases max hp' };
 
-  const test1 = {id: 'test1', name: 'test1', desc: 'test1desc' };
+  const test1 = {id: 'test1', name: 'faster drill', desc: 'increases mining speed' };
   const test2 = {id: 'test2', name: 'test2', desc: 'test2desc' };
 
 
