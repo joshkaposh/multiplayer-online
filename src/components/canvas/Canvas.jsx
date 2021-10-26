@@ -2,12 +2,14 @@ import React, { useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import useUser from '../../context/user';
 import Game from './game/gameManager';
-import Inventory from '../PlayerInventory';
-import DeathMenu from '../DeathMenu';
+import DeathMenu from './game/ui/DeathMenu';
+import PlayerInventory from './game/ui/PlayerInventory';
+
 const socket = io('http://localhost:5000')
 const game = []
 
-const init = (name, canvasRef, gamedata, then) => {
+const init = (name, canvasRef, gamedata) => {
+    console.log(gamedata);
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const g = new Game(socket, ctx, name,gamedata);
@@ -15,9 +17,10 @@ const init = (name, canvasRef, gamedata, then) => {
     game.push(g)
 }
 
+const PlayerStat = ({ id, text }) => <h2>{text}<span id={id}> </span></h2>
 const  PlayerInfo = ({className}) => <div className={className}><h2>{""}</h2></div>
 
-export default function Canvas({gamedata}) {
+export default function Canvas({gamedata,spritesheet}) {
     const { user } = useUser()
     const canvasRef = useRef(null)
 
@@ -25,9 +28,7 @@ export default function Canvas({gamedata}) {
         const canvas = document.getElementById('canvas');
         const c = canvas.getContext('2d')
 
-        let totalFrameTime,lastFrameTime, animationId, fps;
-
-        console.log('FRAMES:::',gamedata.frames)
+        let totalFrameTime,lastFrameTime, animationId;
 
         const animate = () => {
             c.clearRect(0, 0, c.canvas.width, c.canvas.height);
@@ -35,7 +36,6 @@ export default function Canvas({gamedata}) {
             if (!lastFrameTime) {
                 lastFrameTime = performance.now();
                 totalFrameTime = 0;
-                fps = 0;
                 requestAnimationFrame(animate)
                 return;
             }
@@ -48,12 +48,12 @@ export default function Canvas({gamedata}) {
             animationId = window.requestAnimationFrame(animate);
         }
 
-        init(user.username, canvasRef, gamedata)
-        animate();
+            init(user.username, canvasRef, gamedata)
+            animate();
+        
 
         return () => {
-            lastFrameTime =0;
-            fps = 0;
+            lastFrameTime = null;
             window.cancelAnimationFrame(animationId)
         }
     }, [gamedata, user.username]);
@@ -62,18 +62,17 @@ export default function Canvas({gamedata}) {
         <div>
             <PlayerInfo className='player-info' />
             <div className='player-stats'>
-                <h2>Player Status: <span id="status"></span></h2>
-                <h2>Position: <span id="position"> </span></h2>
-                <h2>Velocity: <span id="velocity"> </span></h2>
-
+                <PlayerStat id='status' text='Player Status: ' />
+                <PlayerStat id='position' text='Position: ' />
+                <PlayerStat id='velocity' text='Velocity: ' />
             </div>
             <div className='container'>
                 <canvas id="canvas" ref={canvasRef}></canvas>
-                <Inventory />
                 <DeathMenu ores={{
                     dirt: gamedata.frames.dirt,
                     ...gamedata.frames.ores,
-        }} />
+                }} />
+                <PlayerInventory spritesheet={spritesheet} ores={gamedata.frames.ores} skills={[{ name: 'health' }, { name:'mining_speed'}]} />
            </div>
         </div>
     )

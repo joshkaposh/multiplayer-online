@@ -5,9 +5,6 @@ import Vector from "./game-objects/basic/Vector";
 import { frames } from "./frames/frames.json";
 
 class PlayerSpawnSystem {
-	constructor(stats) {
-		this.player_stats = stats;
-	}
 	setInitialStats(stats) {}
 
 	initialStats() {
@@ -20,35 +17,37 @@ class PlayerSpawnSystem {
 	}
 
 	spawnPlayer({
-		playerName,
+		name,
 		c,
 		camera,
-		playerPosition,
-		tilesize,
-		speed,
+		health,
+		pos,
 		width,
 		height,
+		speed,
+		tilesize,
 		mapW,
 		mapH,
 		columns,
 		rows,
-		frames,
+		tileFrames,
 		color,
 	}) {
 		return new Player(
-			playerName,
+			name,
 			c,
 			camera,
-			playerPosition,
-			tilesize,
-			speed,
+			health,
+			pos,
 			width,
 			height,
+			speed,
+			tilesize,
 			mapW,
 			mapH,
 			columns,
 			rows,
-			frames,
+			tileFrames,
 			color
 		);
 	}
@@ -66,7 +65,8 @@ export default class GameManager extends PlayerSpawnSystem {
 		this.frames = frames;
 		const playerWidth = tilesize / 3;
 		const playerHeight = tilesize - tilesize / 5;
-		const playerPosition = new Vector(mapW / 4, tilesize * 3 - playerHeight);
+		const playerSpeed = { x: 10, y: 10 };
+		const playerPosition = { x: mapW / 4, y: tilesize * 3 - playerHeight };
 		const cameraPosition = new Vector(playerPosition.x, 0);
 		const camera = new Camera(
 			this.c,
@@ -80,25 +80,24 @@ export default class GameManager extends PlayerSpawnSystem {
 			mapH
 		);
 		const player = this.spawnPlayer({
-			playerName,
+			name: playerName,
 			c,
 			camera,
-			playerPosition,
-			tilesize,
-			speed: new Vector(10, 10),
+			health: 500,
+			pos: playerPosition,
 			width: playerWidth,
 			height: playerHeight,
+			speed: playerSpeed,
+			tilesize,
 			mapW,
 			mapH,
 			columns,
 			rows,
-			frames,
+			tileFrames: frames,
 			color: "grey",
 		});
-		console.log(player);
 
 		this.world = new World(this.c, camera, { data: map, rows, columns, tilesize, mapW, mapH }, player);
-		console.log(this.world);
 		this.turn = 0;
 	}
 
@@ -108,11 +107,7 @@ export default class GameManager extends PlayerSpawnSystem {
 		const canvas = document.getElementById("canvas");
 		canvas.style.position = "absolute";
 
-		console.log(this.frames);
-		frames = this.frames;
-
-		// canvas.style.left = window.innerWidth / 2 - this.c.canvas.width / 2;
-		// canvas.style.top = window.innerHeight / 2 - this.c.canvas.height / 2;
+		this.frames = frames;
 
 		this.world.init();
 	}

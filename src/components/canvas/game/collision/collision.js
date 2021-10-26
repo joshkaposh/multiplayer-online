@@ -16,8 +16,8 @@ export default class PlayerCollision {
 
 	getTile(x, y, bool) {
 		if (bool) return this.grid[y * this.columns + x];
-		let x0 = Math.trunc(x / 64);
-		let y0 = Math.trunc(y / 64);
+		let x0 = Math.trunc(x / this.tilesize);
+		let y0 = Math.trunc(y / this.tilesize);
 		return this.grid[y0 * this.columns + x0];
 	}
 
@@ -31,23 +31,25 @@ export default class PlayerCollision {
 				true
 			);
 
-			if (
-				corners[i].y < tile.y + this.tilesize &&
-				corners[i].x > tile.x &&
-				corners[i].x < tile.x + this.tilesize
-			) {
-				if (tile.value !== 0) {
-					bool = true;
+			if (tile) {
+				if (
+					corners[i].y < tile.y + this.tilesize &&
+					corners[i].x > tile.x &&
+					corners[i].x < tile.x + this.tilesize
+				) {
+					if (!tile?.walkable) {
+						bool = true;
+					}
 				}
 			}
 		}
+
 		return bool;
 	}
 
 	collide_down(corners) {
 		//checks adjecent tile top border
 		let bool = false;
-
 		for (let i = 0; i < corners.length; i++) {
 			let tile = this.getTile(
 				Math.floor(corners[i].x / this.tilesize),
@@ -55,9 +57,11 @@ export default class PlayerCollision {
 				true
 			);
 
-			if (corners[i].y >= tile.y && corners[i].x >= tile.x && corners[i].x <= tile.x + this.tilesize) {
-				if (tile.value !== 0) {
-					bool = true;
+			if (tile) {
+				if (corners[i].y >= tile.y && corners[i].x >= tile.x && corners[i].x <= tile.x + this.tilesize) {
+					if (!tile.walkable) {
+						bool = true;
+					}
 				}
 			}
 		}
@@ -74,14 +78,15 @@ export default class PlayerCollision {
 				Math.floor(corners[i].y / this.tilesize),
 				true
 			);
-
-			if (
-				corners[i].x <= tile.x + this.tilesize &&
-				corners[i].y >= tile.y &&
-				corners[i].y <= tile.y + this.tilesize
-			) {
-				if (tile.value !== 0) {
-					bool = true;
+			if (tile) {
+				if (
+					corners[i].x <= tile.x + this.tilesize &&
+					corners[i].y >= tile.y &&
+					corners[i].y <= tile.y + this.tilesize
+				) {
+					if (!tile.walkable) {
+						bool = true;
+					}
 				}
 			}
 		}
@@ -99,13 +104,14 @@ export default class PlayerCollision {
 				true
 			);
 
-			if (corners[i].x > tile.x && corners[i].y > tile.y && corners[i].y < tile.y + this.tilesize) {
-				if (tile.value !== 0) {
-					bool = true;
+			if (tile) {
+				if (corners[i].x > tile.x && corners[i].y > tile.y && corners[i].y < tile.y + this.tilesize) {
+					if (!tile.walkable) {
+						bool = true;
+					}
 				}
 			}
 		}
-
 		return bool;
 	}
 }

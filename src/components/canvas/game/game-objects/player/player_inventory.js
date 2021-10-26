@@ -31,7 +31,7 @@ class Upgrades {
 	healPlayer(player, cost, money) {
 		if (money !== 0) {
 			const hpHealed = Math.trunc(cost / this.heal.inc);
-			player.health += hpHealed;
+			player.stats.health += hpHealed;
 			return true;
 		}
 		return false;
@@ -39,14 +39,14 @@ class Upgrades {
 }
 
 export default class Inventory {
-	constructor(c, health, ores) {
+	constructor(health, ores, oreValues) {
 		// TODO: sync up health to character,
-		this.c = c;
-		this.ores = ores;
-		this.oreValues = {
-			copper: 50,
-			iron: 100,
-		};
+		this.ores = {};
+		this.oreValues = {};
+		for (let i = 0; i < ores.length; i++) {
+			this.ores[ores[i]] = [];
+			this.oreValues[ores[i]] = oreValues[ores[i]].cost;
+		}
 		this.upgrades = new Upgrades(health);
 		this.isVisible = false;
 		this.reset = false;
@@ -54,17 +54,21 @@ export default class Inventory {
 		this.money = 0;
 	}
 
-	// upgradeHealth(current) {
+	addMoney(amount) {
+		this.money += amount;
+		console.log(this.money);
+	}
 
-	// }
+	subMoney(amount) {
+		this.money -= amount;
+	}
+
 	initDeathMenu() {
 		document.getElementById("retry-game").addEventListener("click", (e) => {
 			// reset
-			console.log("SHOULD RESET GAME");
 		});
 		document.getElementById("exit-game").addEventListener("click", (e) => {
 			// exit
-			console.log("SHOULD EXIT GAME");
 		});
 	}
 
@@ -73,14 +77,20 @@ export default class Inventory {
 			//! sell-section
 			const btn = document.getElementById(key + "-sell");
 			const sellAllBtn = document.getElementById(key + "-sell-all");
-			btn.addEventListener("click", this.sell.bind(this, key));
-			sellAllBtn.addEventListener("click", this.sellAll.bind(this, key));
+			btn.addEventListener("click", this.sell.bind(this, key, this.money, this.addMoney.bind(this, this.money)));
+			sellAllBtn.addEventListener(
+				"click",
+				this.sellAll.bind(this, key, this.money, this.addMoney.bind(this, this.money))
+			);
 		});
 
 		Object.keys(this.upgrades).forEach((key) => {
 			//! buy-section
 			const btn = document.getElementById(`buy-${key}`);
-			btn.addEventListener("click", this.buy.bind(this, key, player));
+			btn.addEventListener(
+				"click",
+				this.buy.bind(this, key, player, this.money, this.addMoney.bind(this, this.money))
+			);
 		});
 
 		const exitBtn = document.getElementById("inventory-exit");
@@ -91,72 +101,66 @@ export default class Inventory {
 		this.initDeathMenu();
 	}
 
-	buy(upgrade, player) {
+	buy(upgrade, player, money, cb) {
 		let cost, didUpgrade;
 		switch (upgrade) {
 			case "heal":
 				cost = this.setHealCost(player.health);
-				didUpgrade = this.upgrades.healPlayer(player, cost, this.money);
+				didUpgrade = this.upgrades.healPlayer(player, cost, money);
 				break;
 			case "health":
 				cost = this.setHealthCost();
-				didUpgrade = this.upgrades.increaseMaxHealth(player, cost, this.money);
+				didUpgrade = this.upgrades.increaseMaxHealth(player, cost, money);
 				break;
 			default:
 				break;
 		}
 		if (didUpgrade) {
-			this.money -= cost;
+			money -= cost;
 		}
 	}
 
-	sellAll(ore) {
+	sellAll(ore, money, cb) {
 		if (this.ores[ore].length === 0) return;
+		console.log(ore, money);
 		let count = this.ores[ore].length;
 		let gained = count * this.oreValues[ore];
 		this.ores[ore].length = 0;
-		this.money += gained;
-		console.log(ore);
+		money += gained;
 	}
 
-	sell(ore) {
+	sell(ore, money, cb) {
 		if (this.ores[ore].length === 0) return;
 		this.money += this.oreValues[ore];
+		cb(this.oreValues[ore]);
+		// console.log("after::: ore: %s, money: %s", ore, money);
+
 		this.ores[ore].length -= 1;
-		console.log(this.money);
-		console.log(ore);
 	}
 
 	async add(ore) {
 		await this.ores[ore].push(1);
-		console.log(this.ores[ore]);
-	}
-
-	drawMoney() {
-		this.c.beginPath();
-		this.c.strokeStyle = "#000";
-		this.c.fillStyle = "#000";
-		this.c.font = "25px Arial";
-		this.c.fillText("$" + this.money, this.c.canvas.width - 100, 30);
 	}
 
 	setHealthCost() {
+		// costPerUnit * amountOfUnits + statLevel * costPerlevel
+
 		return (
 			this.upgrades["health"].costPerHP * this.upgrades["health"].inc +
 			this.upgrades["health"].levelInc * this.upgrades["health"].level
 		);
 	}
 
-	setHealCost(health) {
+	setHealCost(health, money) {
 		let currentHP = health;
 		let costPerHP = this.upgrades["heal"].inc;
-		let buyCount = Math.trunc(this.money / costPerHP);
+		let buyCount = Math.trunc(money / costPerHP);
 		let fullHP = this.upgrades.health.maxHP;
 		let missingHP = fullHP - currentHP;
 
 		let cost = Math.trunc(missingHP * costPerHP);
 
-		if (cost > this.money) {
+		if (cost > money) {
 			return buyCount * costPerHP;
 		}
 		return cost;
@@ -179,19 +183,16 @@ export default class Inventory {
 			const item = document.getElementsByClassName(`sell-list-item-${key}`)[0];
 			const header = document.getElementsByClassName(`${key}-count`)[0];
 			const value = document.getElementsByClassName(`${key}-value`)[0];
-			// console.log(item.style.display);
 
-			let count = await this.ores[key].length;
-			if (count > 0) {
+			if (this.ores[key].length > 0) {
+				let cost = this.ores[key].length * this.oreValues[key];
+
 				item.style.display = "inline-flex";
-				const sellbtn = document.getElementsByClassName(key + "-sell")[0];
-				// console.log(sellbtn);
+				value.innerHTML = "$ " + cost;
+				header.innerHTML = "x" + this.ores[key].length + ` ${key}`;
 			} else {
 				item.style.display = "none";
 			}
-
-			value.innerHTML = "$ " + count * this.oreValues[key];
-			header.innerHTML = "x" + count + ` ${key}`;
 		});
 		//! buy section //
 		Object.keys(this.upgrades).forEach((key) => {
@@ -203,7 +204,7 @@ export default class Inventory {
 				cost = this.setHealthCost();
 			}
 			if (key === "heal") {
-				cost = this.setHealCost(health);
+				cost = this.setHealCost(health, this.money);
 			}
 			if (costHeader) {
 				costHeader.innerText = "$ " + cost;

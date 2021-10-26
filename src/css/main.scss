@@ -18,18 +18,20 @@ $buyBtnBorderHovered: 2px solid rgb(200, 0, 0);
 
 $buyBtnRadius: 7px;
 
-$sellColor: rgb(235, 235, 235);
+$sellColor: rgb(10, 10, 10);
 $buyColor: rgb(235, 235, 235);
 
 $navBorder: 2px solid rgba(255, 255, 255, 0.5);
 $inventoryBorder: 2px solid rgba(0, 0, 0, 0.8);
 $sellItemBorder: 1px solid rgba(0, 0, 0, 0.8);
 
-$lightness: 1 * 70%;
+$menuOverlayBg: hsla(360, 100%, 0%, 0.7);
 
-$menuOverlayBg: hsla(360, 120, 0, $lightness);
+$mystery_ore_0: url("../components/canvas/images/mystery-ore-0.png");
+$mystery_ore_1: url("../components/canvas/images/mystery-ore-1.png");
+$mystery_ore_2: url("../components/canvas/images/mystery-ore-2.png");
 
-p {
+* {
 	padding: 0;
 	margin: 0;
 }
@@ -139,182 +141,366 @@ nav {
 	flex-direction: column;
 }
 
-.inventory-closed {
+// .inventory-closed {
+// 	display: none;
+// }
+
+// .inventory-open {
+// 	display: flex;
+// 	flex-direction: column;
+// }
+
+// .inventory-sections {
+// 	display: flex;
+// 	flex-direction: row-reverse;
+// 	height: 100%;
+// }
+
+// .inventory-nav {
+// 	display: flex;
+// 	flex-direction: row-reverse;
+// 	border-bottom: $inventoryBorder;
+
+// 	.inventory-nav-list {
+// 		display: flex;
+// 		align-self: center;
+// 		align-items: center;
+// 		padding: 0 1rem;
+// 		width: 100%;
+
+// 		.inventory-nav-item {
+// 			margin: 0 2rem;
+// 		}
+// 		.inventory-nav-item:first-child {
+// 			margin: 0 2rem 0 auto;
+// 		}
+// 	}
+// }
+
+// #inventory-exit {
+// 	margin-left: auto;
+// 	background-color: rgb(133, 4, 4);
+// 	color: rgb(240, 6, 6);
+// 	border: 1px solid rgb(240, 6, 6);
+// 	border-radius: 5px;
+// }
+// #inventory-exit:hover {
+// 	background-color: rgb(168, 5, 5);
+// 	color: rgb(255, 95, 95);
+// 	border: 1px solid rgb(255, 95, 95);
+// }
+
+// .buy-nav-list {
+// 	display: flex;
+// 	flex-direction: row;
+// 	justify-content: flex-start;
+// 	width: 100%;
+// 	padding: 0;
+// 	padding-bottom: 0.5rem;
+// 	border-bottom: $navBorder;
+
+// 	.buy-nav-item {
+// 		margin-right: 1rem;
+// 		height: 32px;
+// 		width: 32px;
+
+// 		button {
+// 			padding: 0;
+// 			width: 100%;
+// 			height: 100%;
+// 		}
+// 	}
+// }
+
+// .buy-section {
+// 	color: $buyColor;
+// 	width: 300px;
+// 	display: flex;
+// 	text-align: center;
+// 	font-size: 15px;
+
+// 	h4 {
+// 		font-size: 16px;
+// 	}
+
+// 	.buy-list {
+// 		display: flex;
+// 		flex-flow: row nowrap;
+
+// 		.buy-list-item {
+// 			margin-right: 1rem;
+
+// 			.buy-btn {
+// 				border: $buyBtnBorder;
+// 				background-color: $buyBtnBg;
+// 				border-radius: $buyBtnRadius;
+// 				color: $buyBtnColor;
+// 			}
+
+// 			.buy-btn:hover {
+// 				border: $buyBtnBorderHovered;
+// 				background-color: $buyBtnBorderHovered;
+// 			}
+// 		}
+
+// 		.buy-list-item-info {
+// 			display: flex;
+// 			flex-direction: column;
+// 			padding: 0.5rem;
+// 			> * {
+// 				margin-top: 0.2rem;
+// 			}
+// 		}
+// 	}
+// }
+
+// .buy-list-inactive {
+// 	display: none;
+// }
+
+// .buy-list-active {
+// 	display: flex;
+// 	flex-direction: column;
+// }
+
+// .sell-section {
+// 	color: $buyColor;
+// 	width: 300px;
+// 	border-right: $inventoryBorder;
+// 	padding-top: 0.5rem;
+
+// 	.sell-list {
+// 		margin: 0;
+// 		padding: 0;
+// 		max-height: 100%;
+// 		max-width: 90%;
+// 		display: flex;
+// 		flex-direction: column;
+
+// 		.sell-list-item-info {
+// 			display: flex;
+// 			flex-direction: column;
+// 			width: 80%;
+// 		}
+// 		.sell-list-item-info > * {
+// 			width: 50%;
+// 			// margin: 0 auto;
+// 		}
+
+// 		// .sell-list-item-img-bg {
+// 		// 	background-image: url("../components/canvas/images/Sell-Item.png");
+// 		// 	background-repeat: no-repeat;
+// 		// 	background-size: 110%;
+// 		// 	// background-clip: padding-box;
+// 		// }
+
+// 		.sell-list-item {
+// 			color: $buyColor;
+// 			display: inline-flex;
+// 			margin-top: 0.5rem;
+// 			margin-left: 0.5rem;
+// 			padding: 0.25rem 0 0.3rem 1rem;
+// 			align-items: center;
+// 			font-size: 15px;
+// 			border-bottom: $sellItemBorder;
+// 			min-height: 40px;
+// 			max-height: 40px;
+// 			max-width: 260px;
+
+// 			.sell-btn {
+// 				margin-top: 0.5rem;
+// 				padding: 0.25rem 0.5rem;
+// 				border-radius: 5px;
+// 				color: $sellBtnColor;
+// 				background-color: $sellBtnBg;
+// 				border: $sellBtnBorder;
+// 			}
+
+// 			.sell-all-btn {
+// 				width: 5rem;
+// 				margin-right: 0.5rem;
+// 			}
+// 		}
+
+// 		.can-sell {
+// 			transition: ease-in-out border 50ms;
+// 		}
+
+// 		.sell-btn:hover {
+// 			background-color: $sellBtnBgHovered;
+// 			border: $sellBtnBorderHovered;
+// 		}
+// 	}
+// }
+
+// ? --- Player-Skills ---
+
+$ore_height: 64px;
+
+#player-inventory-exit {
+	padding: 0.35rem 0.5rem;
+	position: absolute;
+	right: 0;
+	top: 0;
+	background-color: crimson;
+	border: 1px solid black;
+}
+
+#player-inventory-exit:hover {
+	background-color: rgb(235, 57, 93);
+	color: rgb(51, 51, 51);
+}
+
+.open {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.closed {
 	display: none;
 }
 
-.inventory-open {
-	display: flex;
-	flex-direction: column;
+#player-inventory {
+	z-index: 100;
 }
 
-.inventory-sections {
-	display: flex;
-	flex-direction: row-reverse;
-	height: 100%;
+.ores {
+	border-right: 1px solid grey;
 }
 
-.inventory-nav {
+.ores {
 	display: flex;
-	flex-direction: row-reverse;
-	border-bottom: $inventoryBorder;
+	height: auto;
+	min-width: 300px;
+	max-width: 300px;
+	flex-flow: column nowrap;
 
-	.inventory-nav-list {
-		display: flex;
-		align-self: center;
-		align-items: center;
-		padding: 0 1rem;
-		width: 100%;
+	.mystery-ore-0,
+	.mystery-ore-1,
+	.mystery-ore-2 {
+		background-clip: content-box;
+		background-size: 100%;
+		min-height: $ore_height;
+		max-height: $ore_height;
+		min-width: $ore_height;
+		max-width: $ore_height;
+	}
+	.mystery-ore-0 {
+		background-image: $mystery_ore_0;
+	}
+	.mystery-ore-1 {
+		background-image: $mystery_ore_1;
+	}
+	.mystery-ore-2 {
+		background-image: $mystery_ore_2;
+	}
 
-		.inventory-nav-item {
-			margin: 0 2rem;
-		}
-		.inventory-nav-item:first-child {
-			margin: 0 2rem 0 auto;
+	.ore-container-outter {
+		min-height: $ore_height;
+		max-height: 100px;
+
+		.ore-container-inner {
+			position: relative;
+
+			.mystery-ore {
+				position: absolute;
+				margin-left: 10px;
+			}
+			.ore {
+				min-height: $ore_height;
+				max-height: 100px;
+				width: 100%;
+
+				.ore-inner-container {
+					display: flex;
+					min-height: $ore_height;
+					max-height: 100px;
+					align-items: center;
+					.ore-header {
+						max-width: 100px;
+						min-width: 100px;
+					}
+
+					.ore-stats {
+						display: flex;
+						align-items: center;
+						justify-content: flex-end;
+						margin-left: auto;
+						width: 75%;
+
+						.ore-stat,
+						.ore-sell {
+							margin-right: 10px;
+						}
+
+						.sell-btn {
+							padding: 0.5rem 0.75rem;
+							border-radius: 8px;
+						}
+					}
+				}
+			}
 		}
 	}
 }
 
-#inventory-exit {
-	margin-left: auto;
-	background-color: rgb(133, 4, 4);
-	color: rgb(240, 6, 6);
-	border: 1px solid rgb(240, 6, 6);
-	border-radius: 5px;
-}
-#inventory-exit:hover {
-	background-color: rgb(168, 5, 5);
-	color: rgb(255, 95, 95);
-	border: 1px solid rgb(255, 95, 95);
+.skill {
+	display: flex;
+	flex-direction: column;
 }
 
-.buy-nav-list {
+.upgrade-level,
+.upgrade-unlock {
+	display: none;
+}
+
+.player-skills-container {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: $center;
+	z-index: 100;
+	background-color: rgb(255, 255, 255);
+	border: 1px solid black;
+	width: 600px;
+	height: 500px;
+}
+
+.player-skills {
 	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
 	width: 100%;
-	padding: 0;
-	padding-bottom: 0.5rem;
-	border-bottom: $navBorder;
-
-	.buy-nav-item {
-		margin-right: 1rem;
-		height: 32px;
-		width: 32px;
-
-		button {
-			padding: 0;
-			width: 100%;
-			height: 100%;
-		}
-	}
+	flex-flow: row wrap;
+	justify-content: space-around;
+	align-items: center;
 }
 
-.buy-section {
-	color: $buyColor;
-	width: 300px;
+.player-ores,
+.player-upgrades {
+	max-width: 300px;
+	min-width: 300px;
+	max-height: 500px;
+	min-height: 500px;
+}
+
+.player-upgrades {
 	display: flex;
-	text-align: center;
-	font-size: 15px;
+	flex-flow: row nowrap;
 
-	h4 {
-		font-size: 16px;
-	}
+	.skill {
+		max-width: 150px;
+		min-width: 150px;
+		max-height: 100px;
+		min-height: 100px;
+		padding: 0 0.25rem;
 
-	.buy-list {
-		display: flex;
-		flex-flow: row nowrap;
-
-		.buy-list-item {
-			margin-right: 1rem;
-
-			.buy-btn {
-				border: $buyBtnBorder;
-				background-color: $buyBtnBg;
-				border-radius: $buyBtnRadius;
-				color: $buyBtnColor;
-			}
-
-			.buy-btn:hover {
-				border: $buyBtnBorderHovered;
-				background-color: $buyBtnBorderHovered;
-			}
+		> * {
+			margin-top: 0.25rem;
 		}
 
-		.buy-list-item-info {
-			display: flex;
-			flex-direction: column;
-			padding: 0.5rem;
-			> * {
-				margin-top: 0.2rem;
-			}
-		}
-	}
-}
-
-.buy-list-inactive {
-	display: none;
-}
-
-.buy-list-active {
-	display: flex;
-	flex-direction: column;
-}
-
-.sell-section {
-	color: $sellColor;
-	width: 300px;
-	border-right: $inventoryBorder;
-	padding-top: 0.5rem;
-
-	.sell-list {
-		margin: 0;
-		padding: 0;
-		max-height: 100%;
-		max-width: 90%;
-		display: flex;
-		flex-direction: column;
-
-		.sell-list-item-info {
-			display: flex;
-			flex-direction: column;
+		.upgrade-btn {
 			width: 80%;
-		}
-		.sell-list-item-info > * {
-			width: 50%;
-			// margin: 0 auto;
-		}
-		.sell-list-item {
-			display: inline-flex;
-			margin-top: 0.5rem;
-			margin-left: 0.5rem;
-			padding: 0.25rem 0 0.25rem 1rem;
-			align-items: center;
-			font-size: 15px;
-			border-bottom: $sellItemBorder;
-
-			.sell-btn {
-				margin-top: 0.5rem;
-				padding: 0.25rem 0.5rem;
-				border-radius: 5px;
-				color: $sellBtnColor;
-				background-color: $sellBtnBg;
-				border: $sellBtnBorder;
-			}
-
-			.sell-all-btn {
-				width: 5rem;
-				margin-right: 0.5rem;
-			}
-		}
-
-		.can-sell {
-			transition: ease-in-out border 50ms;
-		}
-
-		.sell-btn:hover {
-			background-color: $sellBtnBgHovered;
-			border: $sellBtnBorderHovered;
+			margin: 0 auto;
 		}
 	}
 }

@@ -1,5 +1,5 @@
-import Vector from "../basic/Vector";
-import { collision, getDistance } from "../../collision/util";
+// import Vector from "../basic/Vector";
+import { collision } from "../../collision/util";
 
 export default class Enemy {
 	constructor(c, pos, width, height, detectionRadius, speed, color) {

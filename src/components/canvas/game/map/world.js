@@ -3,8 +3,8 @@ import Vector from "../game-objects/basic/Vector";
 import { randomInt } from "../collision/util";
 import Shop from "../game-objects/shop/shop";
 import Enemy from "../game-objects/enemy/enemy";
-const images = {};
 
+const images = {};
 images.spritesheet = new Image();
 images.spritesheet.onerror = console.error;
 images.spritesheet.src = game_spritesheet;
@@ -14,12 +14,13 @@ images.spritesheet.src = game_spritesheet;
 export default class World {
 	constructor(c, camera, { tilesize, rows, columns, data, mapW, mapH }, player) {
 		this.c = c;
+		this.spritesheet = images.spritesheet;
 		this.camera = camera;
 		this.player = player;
 		this.tilesize = tilesize;
 		this.columns = columns;
 		this.rows = rows;
-		this.grid = data;
+		this.layers = data;
 		this.initialGrid = data;
 		this.width = mapW;
 		this.height = mapH;
@@ -27,7 +28,9 @@ export default class World {
 		const shopWidth = tilesize * 4;
 		const shopPos = new Vector(mapW / 2, tilesize * 2);
 		this.shop = new Shop(c, shopPos, shopWidth, shopHeight, tilesize, "grey");
-		this.delta = 0;
+		this.delta = null;
+		this.totalDelta = null;
+		this.lastDraw = null;
 		this.mouse = {
 			x: null,
 			y: null,
@@ -60,34 +63,73 @@ export default class World {
 	}
 
 	init() {
+		// todo: deserialize tile functions
+		console.log(this.layers);
+		// for (let i = 0; i < this.layers[1].length; i++) {
+		// 	const tile = this.layers[1][i];
+		// 	if (tile !== 0) {
+		// 		tile.update = function () {
+
+		// 		};
+		// 	}
+		// }
 		this.player.init();
-		this.player.collision.init(this.grid);
+		this.player.collision.init(this.layers[1]);
 		this.enemies.length = 0;
 		this.spawnEnemies();
 	}
 
 	getTile(col, row) {
-		return this.grid[row * this.columns + col];
+		return this.layers[1][row * this.columns + col];
+	}
+
+	getBgTile(col, row) {
+		return this.layers[0][row * this.columns + col];
+	}
+
+	drawEnemies() {
+		if (this.enemies.length > 0) {
+			for (let i = 0; i < this.enemies.length; i++) {
+				let x = this.enemies[i].pos.x - this.camera.pos.x + this.c.canvas.width / 2 - this.camera.width / 2;
+				let y = this.enemies[i].pos.y - this.camera.pos.y + this.c.canvas.height / 2 - this.camera.height / 2;
+				this.enemies[i].draw(x, y);
+			}
+		}
 	}
 
 	drawSprite(img, sX, sY, sW, sH, dX, dY, dW, dH) {
 		this.c.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
 	}
 
-	draw() {
+	animateTile(tile) {
+		const { toxic } = tile.state;
+		tile.lastDraw += this.delta;
+		// console.log(toxic.frames.col);
+		if (tile.lastDraw >= 8) {
+			toxic.frames.col++;
+			if (toxic.frames.col > toxic.frames.end) {
+				toxic.frames.col = toxic.frames.end;
+				toxic.is = false;
+			}
+			tile.lastDraw = this.delta;
+		}
+	}
+
+	drawTiles() {
 		let { xMin, xMax, yMin, yMax } = this.camera.getDimensions();
 		for (let x = xMin; x < xMax; x++) {
 			for (let y = yMin; y < yMax; y++) {
 				// draw grid within camera dimensions
 				const tile = this.getTile(x, y);
-				//!camera centering
-				let tile_x = tile.x - this.camera.pos.x + this.c.canvas.width / 2 - this.camera.width / 2;
-				let tile_y = tile.y - this.camera.pos.y + this.c.canvas.height / 2 - this.camera.height / 2;
+				const bgTile = this.getBgTile(x, y);
+
+				let tile_x = bgTile.x - this.camera.pos.x + this.c.canvas.width / 2 - this.camera.width / 2;
+				let tile_y = bgTile.y - this.camera.pos.y + this.c.canvas.height / 2 - this.camera.height / 2;
 
 				this.drawSprite(
-					images.spritesheet,
-					tile.frameX * (this.tilesize / 2),
-					tile.frameY * (this.tilesize / 2),
+					this.spritesheet,
+					bgTile.frameX * (this.tilesize / 2),
+					bgTile.frameY * (this.tilesize / 2),
 					this.tilesize / 2,
 					this.tilesize / 2,
 					tile_x,
@@ -95,19 +137,59 @@ export default class World {
 					this.tilesize,
 					this.tilesize
 				);
+				//!camera centering
+				if (tile && tile.type !== "mined") {
+					this.drawSprite(
+						this.spritesheet,
+						tile.frameX * (this.tilesize / 2),
+						tile.frameY * (this.tilesize / 2),
+						this.tilesize / 2,
+						this.tilesize / 2,
+						tile_x,
+						tile_y,
+						this.tilesize,
+						this.tilesize
+					);
+					if (tile.state.ore.is) {
+						this.drawSprite(
+							this.spritesheet,
+							tile.state.ore.frames.col * (this.tilesize / 2),
+							tile.state.ore.frames.row * (this.tilesize / 2),
+							this.tilesize / 2,
+							this.tilesize / 2,
+							tile_x,
+							tile_y,
+							this.tilesize,
+							this.tilesize
+						);
+					}
+				}
+				if (tile && tile.type === "mined" && tile.state.toxic.is) {
+					this.drawSprite(
+						this.spritesheet,
+						tile.state.toxic.frames.col * (this.tilesize / 2),
+						tile.state.toxic.frames.row * (this.tilesize / 2),
+						this.tilesize / 2,
+						this.tilesize / 2,
+						tile_x,
+						tile_y,
+						this.tilesize,
+						this.tilesize
+					);
+					this.animateTile(tile);
+				}
 			}
 		}
+	}
 
-		if (this.enemies.length > 0) {
-			for (let i = 0; i < this.enemies.length; i++) {
-				let x = this.enemies[i].pos.x - this.camera.pos.x + this.c.canvas.width / 2 - this.camera.width / 2;
-				let y = this.enemies[i].pos.y - this.camera.pos.y + this.c.canvas.height / 2 - this.camera.height / 2;
+	drawUI() {
+		this.player.drawMoney();
+	}
 
-				this.enemies[i].draw(x, y);
-			}
-		}
-
+	draw() {
+		this.drawTiles();
 		this.player.draw();
+		// this.drawEnemies();
 	}
 
 	resetWorld() {
@@ -121,26 +203,29 @@ export default class World {
 		menu.setAttribute("class", "show");
 	}
 
-	render(delta, totalDelta) {
-		if (this.enemies.length > 0) {
-			for (let i = 0; i < this.enemies.length; i++) {
-				this.enemies[i].update(this.player);
-			}
-		}
+	render(delta) {
+		// if (this.enemies.length > 0) {
+		// for (let i = 0; i < this.enemies.length; i++) {
+		// 	this.enemies[i].update(this.player);
+		// }
+		// }
 
 		this.camera.update(this.player);
-		this.player.update(delta, totalDelta, this.shop);
+		this.player.update(delta, this.shop);
 		this.draw();
 		this.shop.update(this.camera);
-		this.player.inventory.drawMoney();
+		this.drawUI();
 	}
 
-	update(delta, totalDelta) {
+	update(delta) {
+		this.delta = delta;
+		this.lastDraw += delta;
+
 		// if (!this.player.isAlive) {
 		// should die
 		// this.resetWorld()
 		// this.displayDeathMenu();
 		// }
-		this.render(delta, totalDelta);
+		this.render(delta);
 	}
 }
