@@ -267,18 +267,10 @@ class ActionHandlers extends Move {
 
 	movementHandler(trackedMoves, shop) {
 		// ? ----- Movement Section ----- ? //
-		if (this.keys["KeyW"]) {
-			this.jump(trackedMoves);
-		}
-		if (this.keys["KeyA"]) {
-			this.moveLeft(trackedMoves, shop);
-		}
-		if (this.keys["KeyD"]) {
-			this.moveRight(trackedMoves, shop);
-		}
-		if (this.keys["KeyS"]) {
-			this.moveDown(trackedMoves, shop);
-		}
+		if (this.keys["KeyW"]) this.jump(trackedMoves);
+		if (this.keys["KeyA"]) this.moveLeft(trackedMoves, shop);
+		if (this.keys["KeyD"]) this.moveRight(trackedMoves, shop);
+		if (this.keys["KeyS"]) this.moveDown(trackedMoves);
 	}
 
 	_move(shop) {
