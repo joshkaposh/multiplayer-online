@@ -1,0 +1,48 @@
+.visible {
+  height: auto;
+  width: auto;
+  -webkit-transition: all ease-in-out 100ms;
+  transition: all ease-in-out 100ms;
+  -webkit-transform: translate(-50%, 0);
+          transform: translate(-50%, 0);
+}
+
+.invisible {
+  height: auto;
+  width: auto;
+  -webkit-transition: all ease-in-out 100ms;
+  transition: all ease-in-out 100ms;
+  -webkit-transform: translate(-50%, -100%);
+          transform: translate(-50%, -100%);
+}
+
+.hide {
+  display: none;
+}
+
+.show {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.black {
+  background-color: black;
+}
+
+.black > * {
+  color: white;
+}
+
+.white {
+  background-color: white;
+}
+
+.white > * {
+  color: black;
+}
+/*# sourceMappingURL=util.css.map */

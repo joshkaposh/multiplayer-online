@@ -48,7 +48,7 @@ export default class Entity extends EntityMovement {
 	}
 
 	damage(dmg) {
-		if (this.stats.health.current - dmg <= this.minHP) {
+		if (this.stats.health.current - dmg <= this.stats.health.min) {
 			this.isAlive = false;
 			this.stats.health.current = 0;
 		} else {

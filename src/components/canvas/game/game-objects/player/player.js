@@ -99,7 +99,7 @@ export default class Player extends PlayerMovement {
 		let player_x = Math.ceil(this.pos.x - this.camera.pos.x + this.c.canvas.width / 2 - this.camera.width / 2);
 		let player_y = Math.ceil(this.pos.y - this.camera.pos.y + this.c.canvas.height / 2 - this.camera.height / 2);
 		this.sprite.draw(player_x - offsetX, player_y - offsetY);
-		this.c.rect(player_x, player_y, this.width, this.height);
+		// this.c.rect(player_x, player_y, this.width, this.height);
 		this.c.stroke();
 		this.c.closePath();
 		this.drawHealth();
@@ -157,8 +157,9 @@ export default class Player extends PlayerMovement {
 		// ! world.render handles drawing
 	}
 
-	init() {
+	init(grid) {
 		this.attachKeyListener(socket);
 		this.inventory.init(this.stats);
+		this.collision.init(grid);
 	}
 }

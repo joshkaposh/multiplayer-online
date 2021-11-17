@@ -5,8 +5,10 @@ export default function Navbar() {
     return (
         <div>
             <nav>
+                <ul className="nav">
                 <li><NavLink to={{ pathname:'/home'}} >Home</NavLink></li>
                 <li><NavLink to={{pathname:'/'}} >Logout</NavLink></li>
+                </ul>
             </nav>
         </div>
     )

@@ -1,0 +1,37 @@
+.visible {
+	height: auto;
+	width: auto;
+	transition: all ease-in-out 100ms;
+	transform: translate(-50%, 0);
+}
+
+.invisible {
+	height: auto;
+	width: auto;
+	transition: all ease-in-out 100ms;
+	transform: translate(-50%, -100%);
+}
+
+.hide {
+	display: none;
+}
+
+.show {
+	display: flex;
+	flex-direction: column;
+}
+
+.black {
+	background-color: black;
+
+	> * {
+		color: white;
+	}
+}
+
+.white {
+	background-color: white;
+	> * {
+		color: black;
+	}
+}

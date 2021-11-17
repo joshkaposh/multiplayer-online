@@ -1,14 +1,16 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
 import useUser from '../../context/user';
 import Game from './game/gameManager';
 import DeathMenu from './game/ui/DeathMenu';
 import PlayerInventory from './game/ui/PlayerInventory';
+import BackgroundColor from '../ui/BackgroundColor';
 
 const socket = io('http://localhost:5000')
 const game = []
 
 const init = (name, canvasRef, gamedata) => {
+    game.length = 0;
     console.log(gamedata);
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -23,6 +25,9 @@ const  PlayerInfo = ({className}) => <div className={className}><h2>{""}</h2></d
 export default function Canvas({gamedata,spritesheet}) {
     const { user } = useUser()
     const canvasRef = useRef(null)
+    const [bgColor, setBgColor] = useState('white')
+
+
 
     useEffect(() => {
         const canvas = document.getElementById('canvas');
@@ -43,9 +48,14 @@ export default function Canvas({gamedata,spritesheet}) {
             let delta = (performance.now() - lastFrameTime)/1000;
             lastFrameTime = performance.now();
             totalFrameTime += delta;
-            game.forEach(frame => frame.update(delta,totalFrameTime))
+            game[0].update(delta, animationId)
+
+            if (!game[0].player.isAlive) {
+                cancelAnimationFrame(animationId);
+                // todo: display death menu, stats
+            }
+            else animationId = window.requestAnimationFrame(animate);
             
-            animationId = window.requestAnimationFrame(animate);
         }
 
             init(user.username, canvasRef, gamedata)
@@ -58,8 +68,15 @@ export default function Canvas({gamedata,spritesheet}) {
         }
     }, [gamedata, user.username]);
 
+
+    const handleClick = (e) => {
+        e.preventDefault();
+        if (bgColor === 'white') setBgColor('black');
+        else setBgColor('white');
+    }
+
     return (
-        <div>
+        <BackgroundColor handleClick={handleClick} bgColor={bgColor}>
             <PlayerInfo className='player-info' />
             <div className='player-stats'>
                 <PlayerStat id='status' text='Player Status: ' />
@@ -73,7 +90,7 @@ export default function Canvas({gamedata,spritesheet}) {
                     ...gamedata.frames.ores,
                 }} />
                 <PlayerInventory spritesheet={spritesheet} ores={gamedata.frames.ores} skills={[{ name: 'health' }, { name:'mining_speed'}]} />
-           </div>
-        </div>
+            </div>
+            </ BackgroundColor>
     )
 }

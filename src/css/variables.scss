@@ -1,0 +1,36 @@
+$gameWidth: 600px;
+$gameHeight: 400px;
+$ore_height: 64px;
+$center: translate(-50%, 0);
+
+$navColor: rgb(32, 224, 32);
+$navBgColor: rgb(102, 73, 36);
+
+$sellBtnColor: rgb(235, 235, 235);
+$sellBtnBg: rgb(76, 158, 76);
+$sellBtnBorder: 2px solid rgb(14, 139, 14);
+
+$sellBtnBgHovered: rgb(81, 182, 81);
+$sellBtnBorderHovered: 2px solid rgb(18, 163, 18);
+
+$buyBtnColor: rgb(235, 235, 235);
+$buyBtnBorder: 2px solid rgb(161, 0, 0);
+$buyBtnBg: rgb(182, 0, 0);
+
+$buyBtnBgHovered: rgb(161, 0, 0);
+$buyBtnBorderHovered: 2px solid rgb(200, 0, 0);
+
+$buyBtnRadius: 7px;
+
+$sellColor: rgb(10, 10, 10);
+$buyColor: rgb(235, 235, 235);
+
+$navBorder: 2px solid rgba(255, 255, 255, 0.5);
+$inventoryBorder: 2px solid rgba(0, 0, 0, 0.8);
+$sellItemBorder: 1px solid rgba(0, 0, 0, 0.8);
+
+$menuOverlayBg: hsla(360, 100%, 0%, 0.7);
+
+$mystery_ore_0: url("../components/canvas/images/mystery-ore-0.png");
+$mystery_ore_1: url("../components/canvas/images/mystery-ore-1.png");
+$mystery_ore_2: url("../components/canvas/images/mystery-ore-2.png");
