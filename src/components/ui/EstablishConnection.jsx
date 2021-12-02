@@ -1,8 +1,8 @@
 import React,{useState, useEffect} from 'react';
 import io from 'socket.io-client';
-import {UserProvider} from '../context/user'
+import {UserProvider} from '../../context/user'
 import CreateUserMenu from './new-user/CreateUserMenu';
-import Game from './game/GamePage'
+import Game from './GamePage2'
 const socket = io('http://localhost:5000')
 
 
@@ -41,7 +41,7 @@ export default function EstablishConnection() {
     })
     return (
         <>
-            {isAuth ? <UserProvider usr={obj}><Game socket={socket} data={gameData} /></UserProvider>
+            {isAuth ? <UserProvider usr={obj}><Game socket={socket} gamedata={gameData} /></UserProvider>
                 : <CreateUserMenu socket={socket} retry={isAuth} enterName={enterName} />}
         </>
     )

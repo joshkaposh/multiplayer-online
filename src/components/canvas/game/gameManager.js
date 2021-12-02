@@ -94,7 +94,7 @@ export default class GameWorld extends PlayerSpawnSystem {
 			mapH
 		);
 		this.player = this.spawnPlayer({
-			name: playerName,
+			name: playerName || "Josh",
 			c,
 			camera,
 			health: 500,
@@ -309,7 +309,7 @@ export default class GameWorld extends PlayerSpawnSystem {
 		this.drawUI();
 	}
 
-	update(delta, anId) {
+	update(delta) {
 		this.c.imageSmoothingEnabled = false;
 		this.delta = delta;
 		this.lastDraw += delta;

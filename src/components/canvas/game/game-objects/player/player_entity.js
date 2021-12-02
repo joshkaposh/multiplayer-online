@@ -8,7 +8,7 @@ export default class PlayerEntity extends Entity {
 		super(health, pos, width, height, speed, tilesize);
 		this.dmgOverTime = 0.005;
 		this.fallingMinVelocity = 17.5;
-		this.stats.mining_speed = { current: 10 };
+		this.stats.mining_speed = { current: 20 };
 		this.stats.poison = {
 			poisoned: false,
 			current: 1,

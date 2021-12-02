@@ -220,9 +220,6 @@ class Move extends PlayerEntity {
 }
 
 class ActionHandlers extends Move {
-	constructor(health, pos, width, height, speed, columns, rows, mapW, mapH, tilesize, tileFrames) {
-		super(health, pos, width, height, speed, columns, rows, mapW, mapH, tilesize, tileFrames);
-	}
 	miningHandler(shop) {
 		// ? ----- Mining Section ----- ? //
 		let canMine = this.preventDoubleMining();
@@ -267,10 +264,10 @@ class ActionHandlers extends Move {
 
 	movementHandler(trackedMoves, shop) {
 		// ? ----- Movement Section ----- ? //
-		if (this.keys["KeyW"]) this.jump(trackedMoves);
+		if (this.keys["KeyW"]) this.jump(trackedMoves, shop);
 		if (this.keys["KeyA"]) this.moveLeft(trackedMoves, shop);
 		if (this.keys["KeyD"]) this.moveRight(trackedMoves, shop);
-		if (this.keys["KeyS"]) this.moveDown(trackedMoves);
+		if (this.keys["KeyS"]) this.moveDown(trackedMoves, shop);
 	}
 
 	_move(shop) {

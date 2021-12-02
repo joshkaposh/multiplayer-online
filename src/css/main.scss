@@ -35,6 +35,47 @@
 	}
 }
 
+.popup {
+	height: 100%;
+	width: 100%;
+}
+
+.death-menu {
+	color: white;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+}
+
+.death-menu-header {
+	display: flex;
+	flex-direction: column;
+	font-size: 1.5rem;
+	padding-bottom: 5rem;
+}
+
+.death-menu-nav {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	margin: 0 auto;
+	width: 50%;
+	&:first-child {
+		margin-top: 2rem;
+	}
+
+	> * {
+		margin-right: 2.5rem;
+		margin: 0.75rem auto;
+	}
+
+	> *:hover {
+		text-decoration: underline;
+		cursor: pointer;
+	}
+}
+
 #death-menu {
 	position: absolute;
 	left: 50%;

@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
 import useUser from '../../context/user';
-import Game from './game/gameManager';
-import DeathMenu from './game/ui/DeathMenu';
-import PlayerInventory from './game/ui/PlayerInventory';
-import BackgroundColor from '../ui/BackgroundColor';
+import Game from '../canvas/game/gameManager';
+import DeathMenuPopup from './DeathMenuPopup';
+import PlayerInventory from './PlayerInventory';
+import BackgroundColor from './BackgroundColor';
 
 const socket = io('http://localhost:5000')
 const game = []
@@ -25,15 +25,24 @@ const  PlayerInfo = ({className}) => <div className={className}><h2>{""}</h2></d
 export default function Canvas({gamedata,spritesheet}) {
     const { user } = useUser()
     const canvasRef = useRef(null)
-    const [bgColor, setBgColor] = useState('white')
+    const deathMenuRef = useRef(null)
 
+    const [bgColor, setBgColor] = useState('white')
 
 
     useEffect(() => {
         const canvas = document.getElementById('canvas');
         const c = canvas.getContext('2d')
 
-        let totalFrameTime,lastFrameTime, animationId;
+        if (deathMenuRef.current) {
+
+            deathMenuRef.current.classList.toggle('hide', true);
+            deathMenuRef.current.classList.toggle('show', false);
+            
+        }
+
+
+        let totalFrameTime,lastFrameTime, anId;
 
         const animate = () => {
             c.clearRect(0, 0, c.canvas.width, c.canvas.height);
@@ -48,13 +57,16 @@ export default function Canvas({gamedata,spritesheet}) {
             let delta = (performance.now() - lastFrameTime)/1000;
             lastFrameTime = performance.now();
             totalFrameTime += delta;
-            game[0].update(delta, animationId)
+            game[0].update(delta)
 
             if (!game[0].player.isAlive) {
-                cancelAnimationFrame(animationId);
+                cancelAnimationFrame(anId);
+                deathMenuRef.current.classList.toggle('hide', false);
+                deathMenuRef.current.classList.toggle('show', true);
+
                 // todo: display death menu, stats
             }
-            else animationId = window.requestAnimationFrame(animate);
+            else anId = window.requestAnimationFrame(animate);
             
         }
 
@@ -64,7 +76,7 @@ export default function Canvas({gamedata,spritesheet}) {
 
         return () => {
             lastFrameTime = null;
-            window.cancelAnimationFrame(animationId)
+            window.cancelAnimationFrame(anId)
         }
     }, [gamedata, user.username]);
 
@@ -84,11 +96,14 @@ export default function Canvas({gamedata,spritesheet}) {
                 <PlayerStat id='velocity' text='Velocity: ' />
             </div>
             <div className='container'>
-                <canvas id="canvas" ref={canvasRef}></canvas>
-                <DeathMenu ores={{
+                <DeathMenuPopup ores={{
                     dirt: gamedata.frames.dirt,
                     ...gamedata.frames.ores,
-                }} />
+                }}
+                    ref={deathMenuRef}
+                />
+                <canvas id="canvas" ref={canvasRef}></canvas>
+
                 <PlayerInventory spritesheet={spritesheet} ores={gamedata.frames.ores} skills={[{ name: 'health' }, { name:'mining_speed'}]} />
             </div>
             </ BackgroundColor>

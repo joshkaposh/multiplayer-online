@@ -1,4 +1,5 @@
 import React from 'react';
+import Popup from './Popup'
 
 function Stat({label,id}) {
     return (
@@ -23,12 +24,11 @@ function OreStats({ ores }) {
        return <Stat key={key} label={key} id={`${key}-total-mined`} />
     })
 }
-
-export default function DeathMenu({ ores }) {
+const DeathMenu = React.forwardRef(({ ores },ref)=> {
     return (
-            <div id='death-menu' className='hide'>
+        <div id='death-menu' ref={ref}>
+            <Popup >
                 <ul className='death-menu-stats'>
-                    
                     <Stat label='total mined' id='total-mined' />
                     <OreStats ores={ores} />
                     <SurvivalStats />
@@ -37,7 +37,9 @@ export default function DeathMenu({ ores }) {
                     <button id='retry-game' className="death-btn">Retry</button>
                     <button id='exit-game' className="death-btn">Exit</button>
                 </div>
-            </div>
-        
+            </Popup>
+        </div>
     )
-}
+})
+
+export default DeathMenu

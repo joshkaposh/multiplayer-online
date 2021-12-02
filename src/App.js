@@ -1,13 +1,14 @@
 import { Switch, BrowserRouter as Router } from "react-router-dom";
-import Pages from "./components/pages/Pages";
+import Pages from "./components/ui/pages/Pages";
 
 function App() {
 	return (
 		<Router>
-			<div className="App"></div>
-			<Switch>
-				<Pages />
-			</Switch>
+			<div className="App">
+				<Switch>
+					<Pages />
+				</Switch>
+			</div>
 		</Router>
 	);
 }
